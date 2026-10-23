@@ -1,5 +1,6 @@
 "use client";
 import { useForumType } from '@/components/hooks/useForumType';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import React, { use } from 'react';
 import { defineStyles, useStyles } from '@/components/hooks/useStyles';
 import classNames from 'classnames';
@@ -23,6 +24,7 @@ const styles = defineStyles("RouteRootClient", (theme: ThemeType) => ({
     overflowX: 'clip',
     maxWidth: "100%",
   },
+  humanStudyColumn: { width: '100%', paddingTop: 0, minHeight: 'calc(100vh - 64px)' },
   mainFullscreen: {
     flex: 1,
     display: 'flex',
@@ -65,7 +67,7 @@ export const RouteRootClient = ({fullscreen, children}: {
   fullscreen: boolean
   children: React.ReactNode
 }) => {
-  const { isLW } = useForumType();
+  const { isLW, forumType } = useForumType();
   const classes = useStyles(styles);
   const pathname = usePrerenderablePathname();
   const standaloneNavigation = isRouteWithLeftNavigationColumn(pathname);
@@ -82,6 +84,10 @@ export const RouteRootClient = ({fullscreen, children}: {
   const hideNavigationSidebar = !!use(HideNavigationSidebarContext)?.hideNavigationSidebar;
 
   const isFullscreen = isFullscreenRoute(pathname);
+
+  if (humanStudyForumSetting.get(forumType)) return <PopperPortalProvider>
+    <div className={classes.main}><div className={classes.humanStudyColumn}>{children}</div></div>
+  </PopperPortalProvider>;
 
   return <PopperPortalProvider>
     <div className={classNames(classes.main, {[classes.mainFullscreen]: isFullscreen})}>

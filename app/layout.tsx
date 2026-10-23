@@ -1,3 +1,4 @@
+import './humanstudy.css';
 import "@/components/momentjs";
 
 import React, { Suspense } from "react";
@@ -23,7 +24,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html data-humanstudy={process.env.ENV_NAME === "humanstudy" ? "true" : undefined}>
       <head>
         {/* Keep the JSS markers outside Suspense so streamed styles inserted
             between them are preserved during hydration. */}

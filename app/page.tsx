@@ -1,3 +1,5 @@
+import HumanStudyHome from '@/components/humanstudy/HumanStudyHome';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { getForumTypeForPage } from "@/server/utils/pageUtil";
 import React from "react";
 import HomePageWithDesignChat from "@/components/common/HomePageWithDesignChat";
@@ -23,6 +25,7 @@ export default async function Home({ searchParams }: {
   }>;
 }) {
   const forumType = await getForumTypeForPage();
+  if (humanStudyForumSetting.get(forumType)) return <RouteRoot><HumanStudyHome /></RouteRoot>;
   const params = searchParams ? await searchParams : undefined;
   const openCustomizeParam = Array.isArray(params?.openCustomize) ? params?.openCustomize[0] : params?.openCustomize;
 

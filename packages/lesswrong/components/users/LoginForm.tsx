@@ -1,6 +1,6 @@
 import { useForumType } from '@/components/hooks/useForumType';
 import React, { useCallback, useRef, useState } from 'react';
-import { reCaptchaSiteKey } from '../../lib/instanceSettings';
+import { humanStudyForumSetting, reCaptchaSiteKeySetting } from '../../lib/instanceSettings';
 import { useMutation } from "@apollo/client/react";
 import { gql } from '@/lib/generated/gql-codegen';
 import { useMessages } from '../common/withMessages';
@@ -106,9 +106,11 @@ const LoginForm = ({ startingState = "login", returnTo, autoFocus = false }: {
   /** Only enable when the form is opened by a user interaction. */
   autoFocus?: boolean,
 }) => {
-  const { isAF } = useForumType();
+  const { isAF, forumType } = useForumType();
   const classes = useStyles(styles);
-  const hasSubscribeToCuratedCheckbox = !isAF;
+  const reCaptchaSiteKey = reCaptchaSiteKeySetting.get(forumType);
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
+  const hasSubscribeToCuratedCheckbox = !isAF && !isHumanStudy;
 
   const { pathname } = useLocation()
   const reCaptchaToken = useRef<string|null>(null);
@@ -241,13 +243,13 @@ const LoginForm = ({ startingState = "login", returnTo, autoFocus = false }: {
         {currentAction !== "signup" && <span className={classes.toggle} onClick={() => setCurrentAction("signup")}> Sign Up </span>}
         {currentAction !== "pwReset" && <span className={classes.toggle} onClick={() => setCurrentAction("pwReset")}> Reset Password </span>}
       </div>
-      <>
+      {!isHumanStudy && <>
         <div className={classes.oAuthComment}>...or continue with</div>
         <div className={classes.oAuthBlock}>
           <a className={classes.oAuthLink} href={`/auth/google?returnTo=${oauthReturnTo}`}>GOOGLE</a>
           <a className={classes.oAuthLink} href={`/auth/github?returnTo=${oauthReturnTo}`}>GITHUB</a>
         </div>
-      </>
+      </>}
       {displayedError && <div className={classes.error}>{displayedError}</div>}
     </form>
   </ContentStyles>;

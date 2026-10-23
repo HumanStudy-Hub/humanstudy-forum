@@ -1,0 +1,37 @@
+[
+  {
+    "id": "hsExampleWelcome001",
+    "slug": "a-place-to-think-together",
+    "title": "A place to think together",
+    "question": false,
+    "body": "<p><em>Example discussion for the local HumanStudy forum preview.</em></p><p>This community begins with a simple ambition: understand people and society a little better, together.</p><p>You can bring a question, a puzzling observation, a paper, or an explanation you are still working out. A contribution need not be a finished argument. Making a good uncertainty visible can be useful work.</p><h2>What makes a conversation worth keeping?</h2><p>Explain the idea in your own words. Show where the evidence comes from. Distinguish what you observed from what you inferred. When someone offers a competing explanation, help identify what would distinguish the two.</p><p>Longer essays and small questions belong alongside each other here. Over time, discussions can grow into reading collections, better research questions, or a study someone chooses to carry out.</p><p>The HumanStudy tools are available when a question calls for them. The conversation is valuable in its own right.</p>"
+  },
+  {
+    "id": "hsExampleReplicate002",
+    "slug": "an-effect-can-replicate-does-the-explanation",
+    "title": "An effect can replicate. Does the explanation?",
+    "question": false,
+    "body": "<p><em>Example discussion for the local preview; no new experimental result is reported.</em></p><p>Suppose a study's headline difference appears again in a new sample. What have we learned about the explanation behind it?</p><p>One possibility is that two mechanisms produce the same observable difference. Another is that a design carries several changes together, even when we describe it using the name of just one manipulation.</p><h2>A useful next question</h2><p>Rather than asking only whether the average effect returns, we could ask what observation would separate the competing accounts. That might be a new condition, a different measurement, or a prediction about when the effect should disappear.</p><p>What examples have helped you distinguish reproducing a pattern from understanding a mechanism?</p>"
+  },
+  {
+    "id": "hsExampleQuestion003",
+    "slug": "what-would-change-your-mind",
+    "title": "What would change your mind about a behavioral result?",
+    "question": true,
+    "body": "<p><em>Example question for the local preview.</em></p><p>When you read a surprising behavioral finding, which piece of additional information would most change your confidence?</p><p>Possibilities include the full instructions, the individual responses, the sampling process, robustness to another analysis, or a test of a rival explanation. The answer probably depends on the claim.</p><p>It would be useful to work through a concrete case. What claim did you encounter, what was uncertain, and what evidence would have mattered most?</p>"
+  },
+  {
+    "id": "hsExampleMaterials004",
+    "slug": "how-much-of-a-study-lives-outside-the-paper",
+    "title": "How much of a study lives outside the paper?",
+    "question": true,
+    "body": "<p><em>Example question for the local preview.</em></p><p>A method section describes a procedure, but carrying it out can reveal decisions that were never written down: precisely when feedback appears, how an ambiguous answer is coded, or what an experimenter says after a question.</p><p>These details may be routine in one laboratory and unfamiliar in another. Recording the gap is often more informative than filling it with a plausible guess.</p><p>Which missing detail has most changed your understanding of a study? How could researchers make that detail easier for the next person to find?</p>"
+  },
+  {
+    "id": "hsExampleFraming005",
+    "slug": "framing-as-a-family-of-questions",
+    "title": "Framing as a family of questions",
+    "question": false,
+    "body": "<p><em>Example reading note for the local preview.</em></p><p>A shared label can be a useful starting point without making the studies behind it interchangeable.</p><p>When collecting papers on framing, it helps to ask what changes between conditions, what remains fixed, what the participant chooses, and which interpretation the authors test. Those questions can reveal differences that a topic tag alone would conceal.</p><p>A starting source is <a href=\"https://doi.org/10.1126/science.7455683\">Tversky and Kahneman's 1981 paper, The Framing of Decisions and the Psychology of Choice</a>. This note does not report a replication or claim that every framing design shares one mechanism.</p><p>What distinctions would you want a reading collection on this topic to preserve?</p>"
+  }
+]

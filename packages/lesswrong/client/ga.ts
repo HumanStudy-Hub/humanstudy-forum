@@ -1,6 +1,7 @@
-import { googleTagManagerId } from '@/lib/instanceSettings';
+import { googleTagManagerIdSetting, forumTypeSetting } from '@/lib/instanceSettings';
 
 export function googleTagManagerInit() {
+  const googleTagManagerId = googleTagManagerIdSetting.get(forumTypeSetting.get());
   if (googleTagManagerId) {
     (function (w: any, d: any, s: any, l: any, i: any) {
       w[l] = w[l] || [];

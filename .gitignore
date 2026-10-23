@@ -143,3 +143,6 @@ acxMeetupImports/
 # Claude Code
 .claude
 .env*
+
+.humanstudy-tools/
+.humanstudy-data/

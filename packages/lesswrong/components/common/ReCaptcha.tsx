@@ -1,7 +1,8 @@
 // Copied from: https://raw.githubusercontent.com/codeep/react-recaptcha-v3/master/src/ReCaptcha.js
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { reCaptchaSiteKey } from '@/lib/instanceSettings';
+import { useForumType } from '@/components/hooks/useForumType';
+import { reCaptchaSiteKeySetting } from '@/lib/instanceSettings';
 import { isClient } from '../../lib/executionEnvironment';
 
 const propTypes = {
@@ -107,6 +108,7 @@ class ReCaptchaInner extends Component<ReCaptchaInnerProps,ReCaptchaState> {
 (ReCaptchaInner as any).defaultProps = defaultProps;
 
 export default function ReCaptcha({sitekey, ...props}: ReCaptchaProps) {
-  return <ReCaptchaInner {...props} sitekey={sitekey ?? reCaptchaSiteKey} />;
+  const { forumType } = useForumType();
+  return <ReCaptchaInner {...props} sitekey={sitekey ?? reCaptchaSiteKeySetting.get(forumType)} />;
 }
 

@@ -1,4 +1,5 @@
-import { ForumTypeString } from '@/lib/instanceSettings';
+import { humanStudyForumSetting, type ForumTypeString } from '@/lib/instanceSettings';
+import { humanStudyTheme } from './humanStudyTheme';
 
 export const lessWrongTheme: SiteThemeSpecification = {
   componentPalette: (dark: boolean) => ({
@@ -18,6 +19,7 @@ export const alignmentForumTheme: SiteThemeSpecification = {
 };
 
 export const getSiteTheme = (forumType: ForumTypeString): SiteThemeSpecification => {
+  if (humanStudyForumSetting.get(forumType)) return humanStudyTheme;
   if (forumType === 'AlignmentForum') return alignmentForumTheme;
   else return lessWrongTheme;
 }

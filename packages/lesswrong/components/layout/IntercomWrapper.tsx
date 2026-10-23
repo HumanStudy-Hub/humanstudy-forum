@@ -41,7 +41,7 @@ const IntercomWrapper = () => {
   const { cookiePreferences } = useCookiePreferences()
   const functionalCookiesAllowed = cookiePreferences.includes('functional')
   
-  if (isStandaloneRoute(pathname)) {
+  if (!intercomAppIdSetting.get(forumType) || isStandaloneRoute(pathname)) {
     return null;
   }
   if (!functionalCookiesAllowed) {

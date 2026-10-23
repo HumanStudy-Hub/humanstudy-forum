@@ -107,6 +107,8 @@ export type ForumTypeString = UnionOf<typeof allForumTypes>;
 // eslint-disable-next-line no-barrel-files/no-barrel-files
 export { forumTypeSetting, isLW, isEAForum, isAF };
 
+export const humanStudyForumSetting = new PublicInstanceSetting<boolean>('humanStudyForum', false, 'optional');
+
 export const forumTitleSetting = new PublicInstanceSetting<string>('title', 'LessWrong', 'warning') // Default title for URLs
 
 // Your site name may be referred to as "The Alignment Forum" or simply "LessWrong". Use this setting to prevent something like "view on Alignment Forum". Leave the article uncapitalized ("the Alignment Forum") and capitalize if necessary.
@@ -257,8 +259,8 @@ export const accessTokenSecretSetting = new PublicInstanceSetting<string | null>
   Public Database Settings
 */
 
-export const googleTagManagerId: string = "GTM-TRC765W"; // Google Tag Manager ID
-export const reCaptchaSiteKey: string = "6LfFgqEUAAAAAHKdMgzGO-1BRBhHw1x6_8Ly1cXc"; // ReCaptcha API Key
+export const googleTagManagerIdSetting = new PublicInstanceSetting<string>("integrations.googleTagManagerId", "GTM-TRC765W", "optional"); // Google Tag Manager ID
+export const reCaptchaSiteKeySetting = new PublicInstanceSetting<string>("integrations.reCaptchaSiteKey", "6LfFgqEUAAAAAHKdMgzGO-1BRBhHw1x6_8Ly1cXc", "optional"); // ReCaptcha API Key
 // Despite the name, this setting is also used to set the index prefix for Elasticsearch for legacy reasons
 export const algoliaIndexPrefix: string = "test_";
 

@@ -45,7 +45,10 @@
     "depcruise:validate": "dependency-cruiser packages app --validate .dependency-cruiser.js",
     "unused-graphql-fragments": "ts-node --swc -r tsconfig-paths/register scripts/unusedGraphqlFragments.ts",
     "unused-jss-classes": "ts-node --swc -r tsconfig-paths/register scripts/unusedJssClasses.ts",
-    "next-start": "NODE_OPTIONS='--inspect --no-deprecation --enable-source-maps' next start"
+    "next-start": "NODE_OPTIONS='--inspect --no-deprecation --enable-source-maps' next start",
+    "humanstudy:setup": "node scripts/humanstudy-setup.mjs",
+    "humanstudy:dev": "node scripts/humanstudy-dev.mjs",
+    "humanstudy:seed": "node scripts/humanstudy-seed.mjs"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.84",

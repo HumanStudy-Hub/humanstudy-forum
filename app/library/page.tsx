@@ -1,3 +1,6 @@
+import HumanStudyReading from '@/components/humanstudy/HumanStudyReading';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
+import { getForumTypeForPage } from '@/server/utils/pageUtil';
 import React from "react";
 import ForumLibraryPage from '@/components/sequences/ForumLibraryPage';
 import { getDefaultMetadata, getPageTitleFields } from "@/server/pageMetadata/sharedMetadata";
@@ -18,8 +21,9 @@ assertRouteAttributes("/library", {
   hasMarkdownVersion: false,
 });
 
-export default function Page() {
+export default async function Page() {
+  const forumType = await getForumTypeForPage();
   return <RouteRoot>
-    <ForumLibraryPage />
+    {humanStudyForumSetting.get(forumType) ? <HumanStudyReading /> : <ForumLibraryPage />}
   </RouteRoot>;
 }

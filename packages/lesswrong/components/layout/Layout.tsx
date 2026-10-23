@@ -1,5 +1,7 @@
 'use client';
 
+import HumanStudyHeader from '@/components/humanstudy/HumanStudyHeader';
+
 import { useForumType } from '@/components/hooks/useForumType';
 import React, {useRef, useState, useCallback, createContext, useSyncExternalStore} from 'react';
 import classNames from 'classnames'
@@ -10,7 +12,7 @@ import { DialogManager } from '@/components/common/withDialog';
 import { CommentBoxManager } from '@/components/hooks/useCommentBox';
 import { ItemsReadContextWrapper } from '@/components/hooks/useRecordPostView';
 import { pBodyStyle } from '../../themes/stylePiping';
-import { googleTagManagerId } from '@/lib/instanceSettings';
+import { humanStudyForumSetting, googleTagManagerIdSetting } from '@/lib/instanceSettings';
 import { globalStyles } from '../../themes/globalStyles/globalStyles';
 import { excalidrawFontFaces } from '@/lib/lexical/excalidrawFontFaces';
 import { DisableNoKibitzContextProvider } from '@/components/common/sharedContexts';
@@ -177,6 +179,7 @@ const Layout = ({children}: {
 }) => {
   const { isLW, forumType } = useForumType();
   const classes = useStyles(styles);
+  const googleTagManagerId = googleTagManagerIdSetting.get(forumType);
   const currentUser = useCurrentUser();
   const currentUserId = currentUser?._id;
   const searchResultsAreaRef = useRef<HTMLDivElement|null>(null);
@@ -233,14 +236,14 @@ const Layout = ({children}: {
 
               <noscript className="noscript-warning"> This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. </noscript>
               {/* Google Tag Manager i-frame fallback */}
-              <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${googleTagManagerId}`} height="0" width="0" style={{display:"none", visibility:"hidden"}}/></noscript>
+              {googleTagManagerId && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${googleTagManagerId}`} height="0" width="0" style={{display:"none", visibility:"hidden"}}/></noscript>}
 
               {!isStandaloneRoute(prerenderablePathname) && <SuspenseWrapper name="Header">
-                <Header
+                {humanStudyForumSetting.get(forumType) ? <HumanStudyHeader /> : <Header
                   searchResultsArea={searchResultsAreaRef}
                   standaloneNavigationPresent={standaloneNavigation}
                   backgroundColor={headerBackgroundColor}
-                />
+                />}
               </SuspenseWrapper>}
               {/* enable during ACX Everywhere */}
               {renderCommunityMap && <span className={classes.hideHomepageMapOnMobile}>
@@ -253,7 +256,7 @@ const Layout = ({children}: {
                 <FlashMessages />
               </ErrorBoundary>
 
-              {isLW && <LWBackgroundImage />}
+              {isLW && !humanStudyForumSetting.get(forumType) && <LWBackgroundImage />}
               <div ref={searchResultsAreaRef} className={classes.searchResultsArea} />
 
               {children}

@@ -1,6 +1,6 @@
 import { getCookiePreferences } from '../lib/cookies/utils';
 import { isAnyTest, isServer } from '../lib/executionEnvironment';
-import { reCaptchaSiteKey } from '@/lib/instanceSettings';
+import { reCaptchaSiteKeySetting, forumTypeSetting } from '@/lib/instanceSettings';
 
 declare global {
   interface Window {
@@ -23,7 +23,8 @@ let reCaptchaInitialized = false;
  * but it will still work outside GDPR countries at least.
  */
 export async function initReCaptcha() {
-  if (isServer || reCaptchaInitialized) {
+  const reCaptchaSiteKey = reCaptchaSiteKeySetting.get(forumTypeSetting.get());
+  if (isServer || reCaptchaInitialized || !reCaptchaSiteKey) {
     return;
   }
 

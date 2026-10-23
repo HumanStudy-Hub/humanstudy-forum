@@ -1,3 +1,10 @@
+# HumanStudy Forum development instance
+
+Start with [the HumanStudy setup and extension guide](humanstudy/README.md).
+This branch builds a lightweight HumanStudy interface on the official ForumMagnum backend.
+
+---
+
 # Forum Magnum
 
 Forum Magnum is the codebase powering [LessWrong](https://lesswrong.com) and the

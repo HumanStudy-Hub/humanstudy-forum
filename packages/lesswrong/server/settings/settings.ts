@@ -1,3 +1,4 @@
+import { humanStudySettings } from './humanStudy';
 import set from "lodash/set";
 import { baserates } from "./baserates";
 import { localAfDevDb } from "./localAfDevDb";
@@ -12,7 +13,7 @@ import { z } from "zod";
 import { isAnyTest, isProduction } from "@/lib/executionEnvironment";
 import type { ForumTypeString } from "@/lib/instanceSettings";
 
-const validEnvNames = z.enum(["test", "testCrosspost", "baserates","localLwDevDb", "prodLw"]);
+const validEnvNames = z.enum(["test", "testCrosspost", "baserates","localLwDevDb", "prodLw", "humanstudy"]);
 
 function getPublicSettings(forumType: ForumTypeString) {
   if (isAnyTest) {
@@ -35,6 +36,8 @@ function getPublicSettings(forumType: ForumTypeString) {
   const validEnvName = parsedEnvName.data;
 
   switch (validEnvName) {
+    case "humanstudy":
+      return humanStudySettings;
     case "test":
       return testSettings;
     case "testCrosspost":
