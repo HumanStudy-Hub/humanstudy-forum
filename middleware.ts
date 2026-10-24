@@ -1,5 +1,4 @@
 import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server'
-import { randomId } from './packages/lesswrong/lib/random';
 import { getMarkdownPathname } from './packages/lesswrong/lib/routeChecks/markdownVersionRoutes';
 import { STATUS_CODE_LOOPBACK_HEADER, findStatusCodeInStream, fixLoopbackUrl } from './packages/lesswrong/lib/routeChecks/statusCodeLoopback';
 import { buildCachedPostPath, getCacheablePostPagePath, normalizeAcceptEncoding } from './packages/lesswrong/lib/postPageCache/cachedPostRoute';
@@ -33,7 +32,7 @@ function urlIsAbsolute(url: string): boolean {
  */
 export async function middleware(request: NextRequest) {
   const clientIdCookie = request.cookies.get(CLIENT_ID_COOKIE);
-  const addedClientId = clientIdCookie ? null : randomId();
+  const addedClientId = clientIdCookie ? null : crypto.randomUUID().replaceAll('-', '').slice(0, 17);
   const requestPathHasMarkdownVersion = !!getMarkdownPathname(request.nextUrl.pathname);
   
   const isForwarded = request.headers.get(STATUS_CODE_LOOPBACK_HEADER);

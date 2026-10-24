@@ -11,6 +11,23 @@ export const sendMailgunEmail = async (email: RenderedEmail): Promise<boolean> =
     return false;
   }
 
+  if (process.env.ENV_NAME === 'humanstudy') {
+    const apiKey = process.env.HUMANSTUDY_RESEND_API_KEY;
+    const from = process.env.private_defaultEmail;
+    if (!apiKey || !from) throw new Error('Forum email delivery is not configured.');
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: email.to, subject: email.subject, text: email.text, html: email.html }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.error('Forum email delivery failed:', response.status);
+    }
+    return response.ok;
+  }
+
   const mailgunClient = getMailgunClient();
   
   if (!mailgunClient) {

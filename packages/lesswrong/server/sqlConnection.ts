@@ -243,6 +243,7 @@ function getWrappedClient(
   const pgpInstance = getPgPromiseLib();
   const db = pgpInstance({
     connectionString: url,
+    ...(process.env.PG_SSL_CA ? { ssl: { ca: process.env.PG_SSL_CA, rejectUnauthorized: true } } : {}),
     max: MAX_CONNECTIONS,
     // Trying a relatively shorter idle timeout to see if it reduces the connection starvation we see during deploys on Vercel
     idleTimeoutMillis: 5_000,
