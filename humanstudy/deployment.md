@@ -1,79 +1,91 @@
 # Hosted HumanStudy Forum
 
-The forum runs as a separate ForumMagnum application. The main website links to it through
-`/forum`; it is not an iframe or a copy of the local preview database.
+The forum remains a separate ForumMagnum application at https://forum.humanstudy-hub.com,
+linked from the main website through `/forum`. It shares the existing Hub Supabase project
+and Supabase Auth with web and desktop; it does not require a second account or paid project.
 
-On 2026-10-24 the production build completed, HTTPS and discussion reading passed browser checks,
-and native signup/login, HttpOnly sessions and private draft access control passed live API checks.
-The main-site redirect was merged in `humanstudy-hub-web` PR #27 and verified from the public homepage.
-The email-enabled production deployment is `dpl_48unm4XjCFaYir6SdqLs2yJFKpKQ`.
-Resend confirmed real delivery to the owner's mailbox. Native signup verification, one-use links,
-password-reset email, old-password rejection and old-session revocation passed using Resend's
-reserved test recipient. Synthetic test accounts were deactivated afterward.
-
-## Resources
+## Shared resources
 
 - Repository: `HumanStudy-Hub/humanstudy-forum`
-- Deployment branch: `codex/humanstudy-forum-v1`
-- Vercel project: `humanstudy-forum`, in `xuanl17s-projects`
-- Production alias: `https://humanstudy-forum.vercel.app`
-- Active custom domain: `forum.humanstudy-hub.com`
-- Dedicated Supabase project: `humanstudy-forum` (`cmcomuzjmiptqillffea`, us-west-1)
-- Database schema: upstream `schema/accepted_schema.sql`, initialized as `forum_initial_schema`
-- Permission hardening: `forum_api_permissions` revokes public view/RPC access and fixes function search paths
+- Vercel project: `humanstudy-forum`, team `xuanl17s-projects`
+- Supabase project: `zigbuogyerivbnxtnjjw` (`humanstudy-hub-dev`, existing production authority)
+- Private schema: `forum`; never add it to the Supabase Data API exposed schemas
+- Migration: web repository `supabase/migrations/20261024204023_forum_shared_auth.sql`
+- Restricted login: `humanstudy_forum_shared`, no access to Hub public tables or `auth.users`
+- Identity: `forum.HumanStudyAccounts` links Supabase UUIDs to native forum IDs
 - Database identity: `humanstudy-forum`
 
-No existing HumanStudy application tables, accounts or local testing data are imported.
-The five labeled public examples in `humanstudy/examples.json` are the only initial discussions.
-The forum initially has its own native accounts. Hub login is not single sign-on.
+The migration preserves all 99 source tables, including examples and deactivated test data.
+Before importing, a rolled-back transaction ran twice on the target. All 64 imported rows
+were checked using per-table SHA256 digests. The migration and import ran atomically.
+The existing Hub accounts, tables and data were not replaced.
+
+The retired source project is `cmcomuzjmiptqillffea`. Keep it available for rollback until
+shared authentication and writes pass production acceptance, then pause it rather than
+creating another paid compute instance. Do not delete it during this rollout.
 
 ## Server environment
 
-Store these in Vercel, never in Git or a client-visible environment variable:
-
-| Variable | Purpose |
+| Variable | Value or purpose |
 | --- | --- |
 | `ENV_NAME` | `humanstudy` |
-| `FORUM_TYPE` | `LessWrong`, retaining upstream behavior |
-| `HUMANSTUDY_SITE_URL` | Canonical public URL, including trailing slash |
+| `FORUM_TYPE` | `LessWrong` |
+| `HUMANSTUDY_SITE_URL` | `https://forum.humanstudy-hub.com/` |
 | `HUMANSTUDY_DATABASE_ID` | `humanstudy-forum` |
-| `PG_URL` | Supabase transaction pooler URL for the restricted forum runtime role |
-| `PG_SSL_CA` | Supabase production CA certificate; server verification stays enabled |
+| `PG_URL` | Restricted shared-project pooler URL, encrypted production secret |
+| `PG_SCHEMA` | `forum` |
+| `PG_SSL_CA` | Official Supabase CA; full certificate and hostname verification |
 | `PG_MAX_CONNECTIONS` | `2` per function instance |
-| `HUMANSTUDY_RESEND_API_KEY` | Email delivery credential |
-| `private_defaultEmail` | Verified sender formatted as `HumanStudy Forum <address>` |
-| `NODE_OPTIONS` | `--max-old-space-size=8192` for the upstream application build |
-| `NEXT_TELEMETRY_DISABLED` | `1` |
+| `HUMANSTUDY_HUB_AUTH` | `true` |
+| `HUB_AUTH_ORIGIN` | `https://humanstudy-hub.com` |
+| `SUPABASE_URL` | Existing Hub project URL |
+| `SUPABASE_PUBLISHABLE_KEY` | Existing Hub publishable key, never service-role key |
+| `NODE_OPTIONS` | `--max-old-space-size=8192` |
 
-Do not include `sslmode` in `PG_URL`: node-postgres would overwrite the explicit CA configuration.
-All public tables have RLS enabled and no access grants for Supabase's `anon` or `authenticated`
-roles. ForumMagnum authorizes requests through its native server; the dedicated runtime role owns
-the forum tables but cannot create roles, databases or objects in the public schema.
+Do not include `sslmode` in `PG_URL`; node-postgres otherwise replaces explicit TLS settings.
+All forum tables have RLS and a policy restricted to the forum server role. Public, anon and
+authenticated have no forum schema/table/function access. Functions have fixed search paths.
+ForumMagnum's server authorizes ownership, drafts, moderation and GraphQL operations.
+The runtime cannot create schema objects, roles or databases and does not own the tables.
 
-The email adapter uses Resend for this instance and leaves other upstream instances unchanged.
-The forum-specific sending key is stored in Vercel's encrypted production environment. The sender
-is `HumanStudy Forum <no-reply@humanstudy-hub.com>`, on a verified Resend domain.
-Verification and reset links derive from `HUMANSTUDY_SITE_URL`, currently
-`https://forum.humanstudy-hub.com/`. Do not copy a redacted SMTP value from another project's
-configuration or assume that a populated variable proves successful delivery.
+## Accounts and email
 
-## Deployment and verification
+Hub `/account` handles sign-in, registration, password recovery and explicit POST sign-out.
+Both browser sites use secure HttpOnly `hub_access` and `hub_refresh` cookies scoped to
+`.humanstudy-hub.com`. Only trusted production hosts belong under that domain. Preview
+instances must not be configured to issue production parent-domain cookies.
 
-Deployments are initially manual; Git auto-deployment is disabled so an unconfigured preview
-cannot connect to the production database. Configure a separate preview database before enabling it.
-Use Node 24.13+ and the native Turbopack production build (`next build`). The upstream webpack
-build currently fails during static rendering because of internal Next router context usage.
-The local development seed command remains restricted to the local database.
+Both servers verify Supabase `/auth/v1/user` and `hub_session_active` before authorizing a
+shared browser session. The forum delegates refresh to Hub `/auth/refresh`, rather than
+independently rotating refresh tokens. Desktop keeps its existing Supabase session storage;
+sharing the account does not copy browser cookies or local desktop files into the forum.
 
-```sh
-vercel deploy --prod
-```
+Native forum passwords, login tokens, OAuth issuance, verification and reset flows are
+disabled in shared mode. The existing main-project SMTP and central confirmation/reset
+pages send account mail. The prior forum Resend key may remain encrypted for future
+non-account notification mail, but is not a second signup/password system. No automatic
+administrator promotion is performed when provisioning a forum profile.
 
-Before updating the main-site link, verify the public homepage and an example article, native
-signup/login, private draft access, and verification/reset email delivery. Keep preview deployments
-protected. Never copy `.humanstudy-data`, local test accounts, environment files or credentials.
+## Build and rollout
 
-Upstream scheduled jobs are not enabled on this first deployment. Full-text search, image hosting,
-collaborative editing and Hub single sign-on need separate configuration before advertising them.
-Appoint a forum administrator before inviting a wider community, and review moderation and spam
-controls before opening unrestricted registration to the public.
+Use Node 24.13+ and native Turbopack `next build`. Upstream webpack production rendering
+currently fails with an internal Next router context error. Git auto-deploy remains disabled:
+manual production deployments avoid unconfigured previews using production data.
+
+Deploy the main-site shared account routes after the additive RPC migration; then deploy
+forum shared auth and the new PG connection. Verify anonymous reading, real shared sessions,
+refresh, logout/revocation, draft ownership and writes before pausing the source project.
+Keep preview deployments protected.
+
+Private local migration backup (not Git or Vercel upload):
+`.humanstudy-data/hosted-backups/shared-auth-20261024/`, including a per-table manifest.
+Encrypted values are maintained in Vercel; `vercel env pull` redacts sensitive values, so a
+pulled file is not a complete credential backup. Prior deployments retain their immutable
+environments. Never restore or deploy a redacted value as a real credential.
+
+Do not promote the pre-migration forum deployment after new writes exist without reconciling
+those writes: it points at the retired database. Roll back application code against the shared
+schema where possible. The additive migration does not require dropping main-project tables.
+
+Scheduled jobs, full-text search, image hosting and collaborative editing remain separate
+feature configuration. Appoint a forum administrator and review moderation before wider launch.

@@ -15,7 +15,7 @@ class CkEditorUserSessionsRepo extends AbstractRepo<"CkEditorUserSessions"> {
       c."createdAt",
       c."endedAt"
     FROM "CkEditorUserSessions" AS c
-    INNER JOIN public."Posts" AS p ON p._id = c."documentId"
+    INNER JOIN "Posts" AS p ON p._id = c."documentId"
     WHERE
       (c."createdAt" > $1 AND c."endedAt" IS NULL)
       AND p."collabEditorDialogue" IS TRUE
