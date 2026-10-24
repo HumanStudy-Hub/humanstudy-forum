@@ -3,6 +3,11 @@
 The forum runs as a separate ForumMagnum application. The main website links to it through
 `/forum`; it is not an iframe or a copy of the local preview database.
 
+On 2026-10-24 the production build completed, HTTPS and discussion reading passed browser checks,
+and native signup/login, HttpOnly sessions and private draft access control passed live API checks.
+The main-site redirect was merged in `humanstudy-hub-web` PR #27 and verified from the public homepage.
+Email delivery remains blocked on a valid Resend sending key.
+
 ## Resources
 
 - Repository: `HumanStudy-Hub/humanstudy-forum`

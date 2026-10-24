@@ -8,7 +8,9 @@ https://forum.humanstudy-hub.com. The main website's `/forum` entry redirects to
 Local development remains available below. Deployment resources and configuration are documented
 in [deployment.md](deployment.md).
 
-The first hosted build and public discussion reading have passed verification. Email delivery
+The first hosted build, public discussion reading, native signup/password login, HttpOnly sessions,
+private draft creation and guest access denial have passed verification. The synthetic acceptance
+account and private draft were soft-deleted afterward. Email delivery
 still needs a valid Resend sending key; registration verification and password reset are not yet
 certified for this deployment. Native forum accounts are separate from HumanStudy Hub accounts.
 
