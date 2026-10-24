@@ -76,6 +76,17 @@ integration points rather than copying the entire UI into a second project.
 
 These checks used only synthetic local data. They do not certify a production deployment.
 
+## Visual refinement
+
+The homepage now uses a compact introduction, a warm neutral canvas, and a white reading surface.
+Native feed rows use a two-line hierarchy: serif title, followed by author, date and comment count.
+The outline writing button and quieter navigation retain the HumanStudy teal accent.
+No account, post, comment or sorting behavior changes in this refinement.
+
+Screenshots in this directory document the initial version, before this visual refinement.
+Codegen, project type checks and changed-file lint pass for the refinement. A fresh browser visual
+check is pending because browser access to the local preview was rejected by the browser tool.
+
 ## Before opening a shared/public community
 
 - Provision a dedicated persistent PostgreSQL database, domain and deployment. Review upstream

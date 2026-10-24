@@ -3,7 +3,7 @@ html[data-humanstudy="true"] body {
 }
 html[data-humanstudy="true"] body.greyBackground,
 html[data-humanstudy="true"] body.creamBackground {
-  background: light-dark(#f8fbfb, #142123);
+  background: light-dark(#f6f5f1, #142123);
 }
 html[data-humanstudy="true"] a:focus-visible,
 html[data-humanstudy="true"] button:focus-visible {
