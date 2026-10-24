@@ -10,7 +10,7 @@ import { SidebarsContext } from './SidebarsWrapper';
 import withErrorBoundary from '../common/withErrorBoundary';
 import classNames from 'classnames';
 import { AnalyticsContext, useTracking } from '../../lib/analyticsEvents';
-import { forumHeaderTitleSetting, forumShortTitleSetting, humanStudyForumSetting } from '@/lib/instanceSettings';
+import { forumHeaderTitleSetting, forumShortTitleSetting, humanStudyForumSetting, humanStudyHubAuthOriginSetting } from '@/lib/instanceSettings';
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 import { useLocation } from '../../lib/routeUtil';
 import SearchBar from "@/components/common/SearchBar";
@@ -186,6 +186,16 @@ export const styles = defineStyles("Header", (theme: ThemeType) => ({
     position: "relative",
     top: 3,
     color: theme.palette.text.secondary,
+  },
+  // Way back to the main site from every forum page.
+  hubLink: {
+    ...theme.typography.body2,
+    alignSelf: 'center',
+    whiteSpace: 'nowrap',
+    marginRight: 12,
+    color: theme.palette.text.secondary,
+    fontSize: 14,
+    '&:hover': { color: theme.palette.primary.main, opacity: 1 },
   },
   humanStudyWordmark: { fontFamily: theme.palette.fonts.headerStack, fontSize: 23, letterSpacing: '-.02em', color: theme.palette.primary.main, '& span': { fontStyle: 'italic' } },
   titleLink: {
@@ -490,6 +500,11 @@ const Header = ({
   // the items on the right-hand side (search, notifications, user menu, login/sign up buttons)
   const rightHeaderItemsNode = <div className={classNames(classes.rightHeaderItems)}>
     {!humanStudyForumSetting.get(forumType) && <SearchBar onSetIsActive={setSearchOpen} searchResultsArea={searchResultsArea} />}
+
+    {humanStudyForumSetting.get(forumType) && <a href={humanStudyHubAuthOriginSetting.get(forumType)} className={classes.hubLink}>
+      <span className={classes.hideXsDown}>← HumanStudy Hub</span>
+      <span className={classes.hideSmUp}>← Hub</span>
+    </a>}
 
     {!isLoggedIn && <LWUsersAccountMenu />}
 
