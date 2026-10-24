@@ -3,5 +3,5 @@
   "framework": "nextjs",
   "installCommand": "yarn install --frozen-lockfile --ignore-scripts && npm rebuild bcrypt && yarn rebuild-excalidraw && yarn --cwd fly/hocuspocusServer install --frozen-lockfile",
   "buildCommand": "next build",
-  "git": { "deploymentEnabled": { "master": false } }
+  "git": { "deploymentEnabled": false }
 }

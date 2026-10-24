@@ -47,6 +47,8 @@ to the custom domain. Add the DNS record Vercel recommends before changing the c
 
 ## Deployment and verification
 
+Deployments are initially manual; Git auto-deployment is disabled so an unconfigured preview
+cannot connect to the production database. Configure a separate preview database before enabling it.
 Use Node 24.13+ and the native Turbopack production build (`next build`). The upstream webpack
 build currently fails during static rendering because of internal Next router context usage.
 The local development seed command remains restricted to the local database.
