@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import type { ForumTypeString } from "@/lib/instanceSettings";
 import Users from "@/server/collections/users/collection";
 import { ACCOUNT_DELETION_COOLING_OFF_DAYS } from "@/lib/collections/users/helpers";
@@ -11,6 +12,7 @@ const defaultDeleteOptions = { includingNonForumData: false };
 
 
 async function permanentlyDeleteUser(user: DbUser, options: DeleteOptions, forumType: ForumTypeString) {
+  if (usesHubAuth()) throw new Error('Shared HumanStudy accounts must be managed centrally. Native forum account deletion is unavailable.');
   const logger = loggerConstructor(`permanentlyDeleteUsers`);
   const adminContext = createAdminContext({ forumType });
   const adminTeamAccount = await getAdminTeamAccount(adminContext);

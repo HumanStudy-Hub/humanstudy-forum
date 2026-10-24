@@ -3,7 +3,8 @@ export function forumReturnPath(value: string | null | undefined): string {
   try {
     const parsed = new URL(value, 'https://forum.humanstudy-hub.com');
     if (parsed.origin !== 'https://forum.humanstudy-hub.com') return '/';
-    if (parsed.pathname.startsWith('/auth/') || parsed.pathname === '/login' || parsed.pathname === '/logout') return '/';
+    const pathname = parsed.pathname.replace(/\/+$/, '');
+    if (pathname === '/auth' || pathname.startsWith('/auth/') || pathname === '/login' || pathname === '/logout') return '/';
     return parsed.pathname + parsed.search + parsed.hash;
   } catch { return '/'; }
 }
