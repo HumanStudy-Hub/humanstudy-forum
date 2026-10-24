@@ -37,7 +37,9 @@ export async function middleware(request: NextRequest) {
   
   const isForwarded = request.headers.get(STATUS_CODE_LOOPBACK_HEADER);
   if (isForwarded) {
-    return NextResponse.next();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-hsh-request-path', request.nextUrl.pathname + request.nextUrl.search);
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
   
   const markdownNegotiation = getMarkdownNegotiationMode(request);
@@ -64,6 +66,7 @@ export async function middleware(request: NextRequest) {
   if (shouldProxyForStatusCode(request)) {
     const forwardedHeaders = new Headers(request.headers);
     forwardedHeaders.set(STATUS_CODE_LOOPBACK_HEADER, "true");
+    forwardedHeaders.set('x-hsh-request-path', request.nextUrl.pathname + request.nextUrl.search);
     
     const forwardUrl = request.nextUrl.href;
     const fixedForwardedUrl = fixLoopbackUrl(forwardUrl);
@@ -114,7 +117,9 @@ export async function middleware(request: NextRequest) {
     if (addedClientId) {
       addClientIdToRequest(request, addedClientId);
     }
-    const nextResponse = NextResponse.next();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-hsh-request-path', request.nextUrl.pathname + request.nextUrl.search);
+    const nextResponse = NextResponse.next({ request: { headers: requestHeaders } });
     if (requestPathHasMarkdownVersion) {
       addVaryHeader(nextResponse, "accept");
     }

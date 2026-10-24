@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { validateAuthorizationRequest, createAuthorizationCode, OAuthError } from "@/server/oauth/oauthProvider";
 import { getUserFromReq } from "@/server/vulcan-lib/apollo-server/getUserFromReq";
 import { NextResponse, type NextRequest } from "next/server";
@@ -9,6 +10,7 @@ import { captureException } from "@/lib/sentryWrapper";
  * If the user is not logged in, redirects to the login page and comes back.
  */
 export async function GET(req: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use HumanStudy account authentication.' }, { status: 403 });
   const params = req.nextUrl.searchParams;
   const clientId = params.get("client_id") ?? "";
   const redirectUri = params.get("redirect_uri") ?? "";
@@ -75,6 +77,7 @@ export async function GET(req: NextRequest) {
  * POST /oauth/authorize — handles the user's allow/deny decision.
  */
 export async function POST(req: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use HumanStudy account authentication.' }, { status: 403 });
   const user = await getUserFromReq(req);
   if (!user) {
     return new Response("Unauthorized", { status: 401 });

@@ -1,4 +1,7 @@
 import React from 'react';
+import { useForumType } from '@/components/hooks/useForumType';
+import { humanStudyHubAuthSetting, humanStudyHubAuthOriginSetting } from '@/lib/instanceSettings';
+import { hubAccountUrl } from '@/lib/auth/hubAuthLinks';
 import { isFriendlyUI } from '@/themes/forumTheme';
 import { hasAccountDeletionFlow } from '@/lib/betas';
 import Button from '@/lib/vendor/@material-ui/core/src/Button';
@@ -70,6 +73,8 @@ const AccountSettingsTab = ({
   accountManagement,
 }: AccountSettingsTabProps) => {
   const classes = useStyles(styles);
+  const { forumType } = useForumType();
+  const sharedAuth = humanStudyHubAuthSetting.get(forumType);
 
   const deactivated = !!settings.deleted;
 
@@ -79,6 +84,10 @@ const AccountSettingsTab = ({
       : 'Deactivate this account? Your posts and comments will be listed as "[Anonymous]", and your user profile won\'t be accessible.';
     if (!window.confirm(message)) return;
     void updateSettings({ deleted: !deactivated });
+  };
+
+  const manageHubAccount = () => {
+    window.location.href = hubAccountUrl(humanStudyHubAuthOriginSetting.get(forumType), window.location.href);
   };
 
   return (
@@ -93,7 +102,7 @@ const AccountSettingsTab = ({
           />
         )}
 
-        <ExplicitSaveTextSetting
+        {!sharedAuth && <ExplicitSaveTextSetting
           label="Email"
           type="email"
           description="Used for notifications and account recovery"
@@ -101,17 +110,17 @@ const AccountSettingsTab = ({
           confirmMessage={(newValue) => `Change your account email to "${newValue}"?`}
           savedNote="Email updated."
           onSave={(value) => updateSettings({ email: value })}
-        />
+        />}
       </SettingsSection>
 
       {isCurrentUser && <SettingsSection title="Security">
           <div className={classes.resetButtonWrapper}>
             <Button
               className={classes.resetButton}
-              onClick={requestPasswordReset}
+              onClick={sharedAuth ? manageHubAccount : requestPasswordReset}
               disableRipple
             >
-              Reset Password
+              {sharedAuth ? 'Manage HumanStudy account' : 'Reset Password'}
             </Button>
           </div>
         </SettingsSection>}

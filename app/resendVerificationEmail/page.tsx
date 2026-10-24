@@ -1,3 +1,6 @@
+import { redirect } from 'next/navigation';
+import { usesHubAuth } from '@/server/authentication/hubAuth';
+import { hubAccountUrl } from '@/lib/auth/hubAuthLinks';
 import React from "react";
 import ResendVerificationEmailPage from '@/components/users/ResendVerificationEmailPage';
 import { getDefaultMetadata, getPageTitleFields } from "@/server/pageMetadata/sharedMetadata";
@@ -19,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
+  if (usesHubAuth()) redirect(hubAccountUrl(process.env.HUB_AUTH_ORIGIN ?? 'https://humanstudy-hub.com', process.env.HUMANSTUDY_SITE_URL ?? 'https://forum.humanstudy-hub.com/'));
   return <RouteRoot>
     <ResendVerificationEmailPage />
   </RouteRoot>;

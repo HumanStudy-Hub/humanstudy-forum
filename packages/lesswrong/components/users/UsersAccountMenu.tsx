@@ -1,3 +1,6 @@
+import { humanStudyHubAuthSetting, humanStudyHubAuthOriginSetting } from '@/lib/instanceSettings';
+import { useForumType } from '@/components/hooks/useForumType';
+import { hubAccountUrl } from '@/lib/auth/hubAuthLinks';
 import React, { MouseEvent, useCallback, useState } from 'react';
 import Button from '@/lib/vendor/@material-ui/core/src/Button';
 import { useTracking } from '../../lib/analyticsEvents';
@@ -23,15 +26,20 @@ const styles = defineStyles('UsersAccountMenu', (theme: ThemeType) => ({
 export const LWUsersAccountMenu = () => {
   const classes = useStyles(styles);
   const {captureEvent} = useTracking();
+  const { forumType } = useForumType();
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleClick = useCallback((ev: MouseEvent) => {
     ev.preventDefault();
+    if (humanStudyHubAuthSetting.get(forumType)) {
+      window.location.href = hubAccountUrl(humanStudyHubAuthOriginSetting.get(forumType), window.location.href);
+      return;
+    }
     captureEvent("loginButtonClicked", {open: true});
     setOpen(true);
     setAnchorEl(ev.currentTarget as HTMLElement);
-  }, [captureEvent]);
+  }, [captureEvent, forumType]);
 
   const handleRequestClose = useCallback(() => {
     captureEvent("loginButtonClicked", {open: false});

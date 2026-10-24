@@ -8,6 +8,8 @@ if (hostedSiteUrl && !process.env.PG_SSL_CA) throw new Error('PG_SSL_CA is requi
 export const humanStudySettings = {
   forumType: 'LessWrong',
   humanStudyForum: true,
+  humanStudyHubAuth: process.env.HUMANSTUDY_HUB_AUTH === 'true',
+  humanStudyHubAuthOrigin: process.env.HUB_AUTH_ORIGIN ?? 'https://humanstudy-hub.com',
   humanStudy: { featuredPostId: 'hsExampleReplicate002' },
   title: 'HumanStudy Forum',
   tagline: 'Understanding people and society, together.',

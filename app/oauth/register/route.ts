@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { captureException } from "@/lib/sentryWrapper";
 import { registerClient, OAuthError } from "@/server/oauth/oauthProvider";
 import { isLocalhost } from "@/server/utils/getSiteUrl";
@@ -19,6 +20,7 @@ function isValidRedirectUri(uri: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use HumanStudy account authentication.' }, { status: 403 });
   try {
     const body = await req.json();
 

@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { invalidatePostPageCache } from '@/server/postPageCache/invalidatePostPageCache';
 import schema from "@/lib/collections/users/newSchema";
 import { isElasticEnabled } from "@/lib/instanceSettings";
@@ -18,7 +19,7 @@ import gql from "graphql-tag";
 import cloneDeep from "lodash/cloneDeep";
 
 function newCheck() {
-  return true;
+  return !usesHubAuth();
 }
 
 function editCheck(user: DbUser | null, document: DbUser) {
@@ -100,6 +101,9 @@ export async function createUser({ data }: CreateUserInput, context: ResolverCon
 
 export async function updateUser({ selector, data }: { data: UpdateUserDataInput | Partial<DbUser>, selector: SelectorInput }, context: ResolverContext) {
   const { currentUser, Users } = context;
+  if (usesHubAuth() && ['email', 'emails', 'services', 'whenConfirmationEmailSent'].some(field => Object.prototype.hasOwnProperty.call(data, field))) {
+    throw new Error('Manage your email and account security in your HumanStudy account.');
+  }
 
   // Save the original mutation (before callbacks add more changes to it) for
   // logging in FieldChanges

@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { generateOAuthState, getGoogleAuthUrl } from '@/lib/auth/googleOAuth';
@@ -14,6 +15,7 @@ const GOOGLE_OAUTH_COOKIE_SETTINGS: Omit<ResponseCookie, 'name' | 'value'> = {
 };
 
 export async function GET(request: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use your HumanStudy account to sign in.' }, { status: 403 });
   const searchParams = request.nextUrl.searchParams;
   const returnTo = sanitizeLoginReturnTo(searchParams.get('returnTo') ?? undefined);
   

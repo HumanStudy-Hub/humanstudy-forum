@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import type { ForumTypeString } from '@/lib/instanceSettings';
 import React from "react";
 import Users from "@/server/collections/users/collection";
@@ -122,6 +123,7 @@ export const welcomeMessageDelayer = new EventDebouncer({
 });
 
 async function sendVerificationEmail(user: DbUser, forumType: ForumTypeString) {
+  if (usesHubAuth()) return;
   const verifyEmailLink = await emailTokenTypesByName.verifyEmail.generateLink(user._id, forumType);
   await wrapAndSendEmail({
     forumType,
