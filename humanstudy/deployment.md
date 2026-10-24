@@ -6,7 +6,10 @@ The forum runs as a separate ForumMagnum application. The main website links to 
 On 2026-10-24 the production build completed, HTTPS and discussion reading passed browser checks,
 and native signup/login, HttpOnly sessions and private draft access control passed live API checks.
 The main-site redirect was merged in `humanstudy-hub-web` PR #27 and verified from the public homepage.
-Email delivery remains blocked on a valid Resend sending key.
+The email-enabled production deployment is `dpl_48unm4XjCFaYir6SdqLs2yJFKpKQ`.
+Resend confirmed real delivery to the owner's mailbox. Native signup verification, one-use links,
+password-reset email, old-password rejection and old-session revocation passed using Resend's
+reserved test recipient. Synthetic test accounts were deactivated afterward.
 
 ## Resources
 
@@ -14,7 +17,7 @@ Email delivery remains blocked on a valid Resend sending key.
 - Deployment branch: `codex/humanstudy-forum-v1`
 - Vercel project: `humanstudy-forum`, in `xuanl17s-projects`
 - Production alias: `https://humanstudy-forum.vercel.app`
-- Intended custom domain: `forum.humanstudy-hub.com`
+- Active custom domain: `forum.humanstudy-hub.com`
 - Dedicated Supabase project: `humanstudy-forum` (`cmcomuzjmiptqillffea`, us-west-1)
 - Database schema: upstream `schema/accepted_schema.sql`, initialized as `forum_initial_schema`
 - Permission hardening: `forum_api_permissions` revokes public view/RPC access and fixes function search paths
@@ -48,11 +51,11 @@ roles. ForumMagnum authorizes requests through its native server; the dedicated 
 the forum tables but cannot create roles, databases or objects in the public schema.
 
 The email adapter uses Resend for this instance and leaves other upstream instances unchanged.
-The SMTP value returned by the existing Supabase project's configuration did not authenticate
-with Resend. A valid sending key is still needed; do not treat a populated environment variable
-as evidence of successful delivery. A configuration test was rejected and no email was sent.
-Verification and reset links derive from `HUMANSTUDY_SITE_URL`; change it and redeploy when moving
-to the custom domain. Add the DNS record Vercel recommends before changing the canonical URL.
+The forum-specific sending key is stored in Vercel's encrypted production environment. The sender
+is `HumanStudy Forum <no-reply@humanstudy-hub.com>`, on a verified Resend domain.
+Verification and reset links derive from `HUMANSTUDY_SITE_URL`, currently
+`https://forum.humanstudy-hub.com/`. Do not copy a redacted SMTP value from another project's
+configuration or assume that a populated variable proves successful delivery.
 
 ## Deployment and verification
 

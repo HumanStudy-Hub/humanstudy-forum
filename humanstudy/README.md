@@ -10,9 +10,11 @@ in [deployment.md](deployment.md).
 
 The first hosted build, public discussion reading, native signup/password login, HttpOnly sessions,
 private draft creation and guest access denial have passed verification. The synthetic acceptance
-account and private draft were soft-deleted afterward. Email delivery
-still needs a valid Resend sending key; registration verification and password reset are not yet
-certified for this deployment. Native forum accounts are separate from HumanStudy Hub accounts.
+account and private draft were soft-deleted afterward. Resend delivery to the owner's mailbox was
+confirmed as delivered. Native registration verification, one-use email links, password reset,
+old-password rejection and old-session revocation passed live checks using Resend's reserved test
+recipient; the synthetic mail-test accounts were deactivated. Native forum accounts remain separate
+from HumanStudy Hub accounts.
 
 ## Product direction
 
