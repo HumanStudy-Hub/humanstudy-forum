@@ -16184,6 +16184,24 @@ type UserClientIdsInfoQueryQueryVariables = Exact<{
 
 type UserClientIdsInfoQueryQuery = UserClientIdsInfoQueryQuery_Query;
 
+type HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post_user_User = { __typename?: 'User', _id: string, displayName: string };
+
+type HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post_contents_Revision = { __typename?: 'Revision', _id: string, plaintextDescription: string };
+
+type HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post = { __typename?: 'Post', _id: string, title: string, slug: string, user: HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post_user_User | null, contents: HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post_contents_Revision | null };
+
+type HumanStudyFeaturedPostQuery_post_SinglePostOutput = { __typename?: 'SinglePostOutput', result: HumanStudyFeaturedPostQuery_post_SinglePostOutput_result_Post | null };
+
+type HumanStudyFeaturedPostQuery_Query = { __typename?: 'Query', post: HumanStudyFeaturedPostQuery_post_SinglePostOutput | null };
+
+
+type HumanStudyFeaturedPostQueryVariables = Exact<{
+  documentId: Scalars['String']['input'];
+}>;
+
+
+type HumanStudyFeaturedPostQuery = HumanStudyFeaturedPostQuery_Query;
+
 type multiJargonTermGlossaryEditFormQueryQuery_jargonTerms_MultiJargonTermOutput_results_JargonTerm = (
   { __typename?: 'JargonTerm' }
   & JargonTerms

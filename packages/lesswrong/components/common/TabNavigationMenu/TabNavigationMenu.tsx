@@ -1,3 +1,4 @@
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { useForumType } from '@/components/hooks/useForumType';
 import React from 'react';
 import { useCurrentUserId } from '../withUser';
@@ -65,7 +66,7 @@ const TabNavigationMenu = ({ onClickSection, transparentBackground, iconOnlyNavi
     onClickSection && onClickSection(e)
   }
 
-  const tabs = forumSelect(getMenuTabs(), forumType);
+  const tabs = forumSelect(getMenuTabs(humanStudyForumSetting.get(forumType)), forumType);
   const filteredTabs = iconOnly
     ? tabs.filter(tab => {
       if ('customComponentName' in tab) return false

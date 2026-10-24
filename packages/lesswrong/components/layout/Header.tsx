@@ -10,7 +10,7 @@ import { SidebarsContext } from './SidebarsWrapper';
 import withErrorBoundary from '../common/withErrorBoundary';
 import classNames from 'classnames';
 import { AnalyticsContext, useTracking } from '../../lib/analyticsEvents';
-import { forumHeaderTitleSetting, forumShortTitleSetting } from '@/lib/instanceSettings';
+import { forumHeaderTitleSetting, forumShortTitleSetting, humanStudyForumSetting } from '@/lib/instanceSettings';
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 import { useLocation } from '../../lib/routeUtil';
 import SearchBar from "@/components/common/SearchBar";
@@ -488,7 +488,7 @@ const Header = ({
 
   // the items on the right-hand side (search, notifications, user menu, login/sign up buttons)
   const rightHeaderItemsNode = <div className={classNames(classes.rightHeaderItems)}>
-    <SearchBar onSetIsActive={setSearchOpen} searchResultsArea={searchResultsArea} />
+    {!humanStudyForumSetting.get(forumType) && <SearchBar onSetIsActive={setSearchOpen} searchResultsArea={searchResultsArea} />}
 
     {!isLoggedIn && <LWUsersAccountMenu />}
 

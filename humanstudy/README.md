@@ -12,7 +12,7 @@ Understanding people and society, together. Questions, observations, explanation
 can all begin a conversation. Research assets can be linked using ordinary post links. No special
 submission template, new research schema or mandatory experiment pipeline is imposed on a post.
 
-The first version is an instance configuration, a small theme, and a simpler default interface.
+The current version preserves the upstream visual system and layout, with a small instance configuration and color accent.
 Upstream owns accounts, sessions, password hashing, post/comment mutations, editor revisions,
 voting, bookmarks, moderation and reading collections. Do not introduce parallel implementations.
 
@@ -52,7 +52,7 @@ in the local data folder; none is copied into Git.
 | --- | --- |
 | Instance identity and integration settings | `packages/lesswrong/server/settings/humanStudy.ts` |
 | Colors and typography | `packages/lesswrong/themes/humanStudyTheme.ts` |
-| Header/navigation | `packages/lesswrong/components/humanstudy/HumanStudyHeader.tsx` |
+| Native header/navigation | `packages/lesswrong/components/layout/Header.tsx`, `components/common/TabNavigationMenu/menuTabs.tsx` |
 | Homepage and native post feed | `packages/lesswrong/components/humanstudy/HumanStudyHome.tsx` |
 | Reading collections | `packages/lesswrong/components/humanstudy/HumanStudyReading.tsx` |
 | Scoped document/readability CSS | `app/humanstudy.css` |
@@ -76,22 +76,24 @@ integration points rather than copying the entire UI into a second project.
 
 These checks used only synthetic local data. They do not certify a production deployment.
 
-## Visual refinement
+## Current visual baseline
 
-The homepage now uses a compact introduction, a warm neutral canvas, and a white reading surface.
-Native feed rows use a two-line hierarchy: serif title, followed by author, date and comment count.
-The outline writing button and quieter navigation retain the HumanStudy teal accent.
-No account, post, comment or sorting behavior changes in this refinement.
+The forum now uses upstream typography, native Header and navigation drawer/sidebar, native
+RouteRootClient column layout, original compact post rows and background illustration. The custom
+header, large introduction, boxed feed and row CSS overrides have been removed. Only a restrained
+teal accent, four relevant navigation items and HumanStudy identity differ from the native chrome.
+Upstream seasonal banners are not shown for this instance. The inherited illustration is retained
+for this local design comparison; choose HumanStudy artwork before a public launch.
 
-The initial screenshots remain for comparison. `home-refined-desktop.jpg` and
-`home-refined-mobile.jpg` show the corrected layout at 1280px and 375px. Both were checked in
-the browser with no horizontal overflow. Computed grid positions confirm titles on the first
-row and author, date and comments together on the second. The native Questions filter still
-returns the two question examples. Codegen, project type checks and changed-file lint pass.
+The homepage uses native SingleColumnSection and PostsList2. A featured post is queried from the
+actual database through `humanStudy.featuredPostId`; its title, author and description are not a
+second hardcoded copy. The homepage shows a short reading preview with a link to the full article.
+No stored post content is changed or shortened. Set the featured ID to null to omit the feature.
 
-The correction removes nested selector repetition that prevented title/author placement and
-positions the date's tooltip wrapper, which is the actual grid child. Homepage titles are now
-20px with tighter spacing. Repeated welcome copy has been removed from the sidebar.
+Current screenshot evidence: `home-native-desktop.jpg` and `home-native-mobile.jpg`. Earlier
+screenshots remain as iteration history. Browser checks at 1280px and 375px confirm native layouts,
+no horizontal overflow and a working Questions filter. Codegen, project types and changed-file lint
+pass. Search remains hidden because the search service has not been configured.
 
 ## Before opening a shared/public community
 

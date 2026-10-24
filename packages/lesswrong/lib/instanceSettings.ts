@@ -107,6 +107,8 @@ export type ForumTypeString = UnionOf<typeof allForumTypes>;
 // eslint-disable-next-line no-barrel-files/no-barrel-files
 export { forumTypeSetting, isLW, isEAForum, isAF };
 
+export const humanStudyFeaturedPostIdSetting = new PublicInstanceSetting<string | null>('humanStudy.featuredPostId', null, 'optional');
+
 export const humanStudyForumSetting = new PublicInstanceSetting<boolean>('humanStudyForum', false, 'optional');
 
 export const forumTitleSetting = new PublicInstanceSetting<string>('title', 'LessWrong', 'warning') // Default title for URLs

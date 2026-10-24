@@ -1,3 +1,4 @@
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { useForumType } from '@/components/hooks/useForumType';
 import React from 'react';
 
@@ -32,7 +33,7 @@ const TabNavigationMenuCompressed = ({onClickSection}: {
   const classes = useStyles(styles);
   return (
     <div className={classes.root}>
-      {forumSelect(getMenuTabs(), forumType).map(tab => {
+      {forumSelect(getMenuTabs(humanStudyForumSetting.get(forumType)), forumType).map(tab => {
         if (!('showOnCompressed' in tab) || !tab.showOnCompressed) {
           return
         }

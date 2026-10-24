@@ -1,5 +1,6 @@
 import { useForumType } from '@/components/hooks/useForumType';
 import React from 'react';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { registerComponent } from '@/lib/vulcan-lib/components';
 import { defineStyles, useStyles } from '@/components/hooks/useStyles';
 import CloudinaryImage2 from "@/components/common/CloudinaryImage2";
@@ -214,7 +215,7 @@ export const LWBackgroundImage = () => {
   }
 
   return <div className={classes.root}>
-    {homePageImage}
+    {humanStudyForumSetting.get(forumType) ? defaultImage : homePageImage}
     {/* {showSolsticeButton && (
       <button
         className={classes.showSolsticeButton}

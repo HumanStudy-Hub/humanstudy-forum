@@ -4,91 +4,80 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Link } from '@/lib/reactRouterWrapper';
 import { defineStyles, useStyles } from '@/components/hooks/useStyles';
+import { useForumType } from '@/components/hooks/useForumType';
+import { humanStudyFeaturedPostIdSetting } from '@/lib/instanceSettings';
+import { useQuery } from '@/lib/crud/useQuery';
+import { gql } from '@/lib/generated/gql-codegen';
 import PostsList2 from '@/components/posts/PostsList2';
+import SingleColumnSection from '@/components/common/SingleColumnSection';
+import { SuspenseWrapper } from '@/components/common/SuspenseWrapper';
+
+const featuredPostQuery = gql(`
+  query HumanStudyFeaturedPost($documentId: String!) {
+    post(input: { selector: { documentId: $documentId } }) {
+      result {
+        _id
+        title
+        slug
+        user { _id displayName }
+        contents { _id plaintextDescription }
+      }
+    }
+  }
+`);
 
 const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
-  root: {
-    fontFamily: theme.palette.fonts.sansSerifStack,
-    maxWidth: 1120,
-    margin: '0 auto',
-    padding: '34px 36px 80px',
-    [theme.breakpoints.down('sm')]: { padding: '28px 20px 60px' },
-  },
-  hero: { paddingBottom: 26 },
-  eyebrow: { color: theme.palette.primary.main, fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', margin: '0 0 12px' },
-  title: { fontFamily: theme.palette.fonts.serifStack, color: theme.palette.text.primary, fontWeight: 400, fontSize: 34, lineHeight: 1.25, letterSpacing: '-.025em', margin: '0 0 10px', [theme.breakpoints.down('sm')]: { fontSize: 29 } },
-  description: { color: theme.palette.text.secondary, fontSize: 14, lineHeight: 1.7, margin: 0 },
-  content: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 212px', gap: 40, alignItems: 'start', [theme.breakpoints.down('sm')]: { gridTemplateColumns: '1fr', gap: 32 } },
-  discussions: {
-    minWidth: 0,
-    background: theme.palette.panelBackground.default,
-    border: theme.palette.greyBorder('1px', .09),
-    borderRadius: 3,
-    padding: '0 26px 10px',
-    [theme.breakpoints.down('sm')]: { padding: '0 16px 8px' },
-    '& .LWPostsItem-background': { background: 'transparent' },
-    '& .LWPostsItem-bottomBorder': { borderBottom: theme.palette.greyBorder('1px', .09) },
-    '& .LWPostsItem-postsItem': {
-      display: 'grid',
-      gridTemplateColumns: '24px minmax(0, max-content) max-content minmax(0, 1fr)',
-      columnGap: 12,
-      rowGap: 6,
-      padding: '17px 0',
-      alignItems: 'center',
-    },
-    '& .LWPostsItem-title.LWPostsItem-title': { gridColumn: '2 / -1', gridRow: 1, minWidth: 0, width: 'auto', maxWidth: 'none', height: 'auto', minHeight: 0, overflow: 'visible', margin: 0, padding: 0, top: 0,
-    },
-    '& .PostsTitle-root': { fontSize: 20, lineHeight: 1.4, letterSpacing: '-.01em', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', marginRight: 0 },
-    '& .LWPostsItem-karma': { gridColumn: 1, gridRow: '1 / 3', alignSelf: 'start', paddingTop: 5, width: 'auto', margin: 0, color: theme.palette.text.secondary, fontSize: 12 },
-    '& .LWPostsItem-author.LWPostsItem-author': { gridColumn: 2, gridRow: 2, flex: 'none', minWidth: 0, maxWidth: 180, margin: 0, fontSize: 12, color: theme.palette.text.secondary },
-    '& .LWPostsItem-postsItem > .LWTooltip-root:has(.PostsItemDate-postedAt)': { gridColumn: 3, gridRow: 2 },
-    '& .PostsItemDate-postedAt.PostsItemDate-postedAt': { width: 'auto', fontSize: 12, fontWeight: 400, color: theme.palette.text.secondary },
-    '& .LWPostsItem-tertiaryRow': { gridColumn: 4, gridRow: 2, margin: 0, justifyContent: 'flex-start' },
-    '& .LWPostsItem-spacer, & .LWPostsItem-mobileSecondRowSpacer, & .LWPostsItem-mobileActions, & .LWPostsItem-mobileIcons': { display: 'none' },
-    '& .PostsItemComments-commentsIconLarge': { display: 'flex', alignItems: 'center', gap: 5, width: 'auto', height: 18, top: 0, color: theme.palette.text.secondary },
-    '& .PostsItemComments-commentCountIcon': { position: 'static', transform: 'none', width: 13, height: 13, opacity: .5 },
-    '& .PostsItemComments-commentCount': { position: 'static', transform: 'none', fontFamily: theme.palette.fonts.sansSerifStack, fontSize: 12, lineHeight: 1, color: theme.palette.text.secondary, '& div': { margin: 0 } },
-    '& .PostsTitle-interactionWrapper': { fontFamily: theme.palette.fonts.sansSerifStack, fontSize: 12, verticalAlign: 'middle', marginLeft: 8 },
-  },
-  controls: { display: 'flex', gap: 24, borderBottom: theme.palette.greyBorder('1px', .13), paddingTop: 20 },
-  tab: { border: 0, background: 'none', padding: '0 0 14px', font: 'inherit', fontSize: 13, color: theme.palette.text.secondary, cursor: 'pointer', borderBottom: '2px solid transparent', '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 4 } },
-  active: { color: theme.palette.primary.main, borderBottomColor: theme.palette.primary.main, fontWeight: 600 },
-  aside: { paddingTop: 2, fontSize: 13, lineHeight: 1.8, color: theme.palette.text.secondary, '& h2': { fontFamily: theme.palette.fonts.sansSerifStack, fontSize: 12, color: theme.palette.text.primary, fontWeight: 600, lineHeight: 1.4, margin: '0 0 12px' }, '& p': { margin: '0 0 24px' } },
-  write: { display: 'block', padding: '9px 16px', marginBottom: 30, border: `1px solid ${theme.palette.primary.main}`, borderRadius: 3, color: theme.palette.primary.main, textAlign: 'center', fontWeight: 500, fontSize: 13, '&:hover': { background: theme.palette.greyAlpha(.035) } },
-  asideLinks: { borderTop: theme.palette.greyBorder('1px', .12), paddingTop: 17 },
-  link: { display: 'block', padding: '5px 0', color: theme.palette.text.secondary, '&:hover': { color: theme.palette.primary.main } },
-  footer: { marginTop: 28, paddingTop: 18, borderTop: theme.palette.greyBorder('1px', .12), fontSize: 11, color: theme.palette.text.secondary },
+  root: { paddingBottom: 56 },
+  featured: { background: theme.palette.panelBackground.translucent3, padding: '20px 24px', marginBottom: 28, [theme.breakpoints.down('sm')]: { padding: '18px 16px' } },
+  kicker: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, margin: '0 0 8px' },
+  title: { ...theme.typography.headerStyle, fontFamily: theme.palette.fonts.headerStack, fontSize: 25, fontWeight: 400, fontVariant: 'small-caps', lineHeight: 1.25, margin: '0 0 12px' },
+  excerpt: { ...theme.typography.commentStyle, fontSize: 15, lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
+  read: { color: theme.palette.primary.main, marginLeft: 16 },
+  byline: { ...theme.typography.commentStyle, fontSize: 13, color: theme.palette.text.dim3 },
+  controls: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' },
+  tab: { ...theme.typography.commentStyle, fontSize: 13, border: 0, borderRadius: 2, padding: '6px 16px', background: theme.palette.panelBackground.default, color: theme.palette.text.dim3, cursor: 'pointer', '&:hover': { color: theme.palette.text.normal } },
+  active: { background: theme.palette.primary.main, color: theme.palette.primary.contrastText, '&:hover': { color: theme.palette.primary.contrastText } },
+  write: { ...theme.typography.commentStyle, marginLeft: 'auto', fontSize: 13, padding: '6px 0 6px 12px', color: theme.palette.text.dim3, '&:hover': { color: theme.palette.primary.main } },
+  footer: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: '8px 20px' },
 }));
 
-const tabs = [{ id: 'new', label: 'Latest' }, { id: 'top', label: 'Top' }, { id: 'questions', label: 'Questions' }] as const;
+const tabs = [{ id: 'new', label: 'Recent' }, { id: 'top', label: 'Top' }, { id: 'questions', label: 'Questions' }] as const;
 type Feed = typeof tabs[number]['id'];
+
+function FeaturedDiscussion({ documentId }: { documentId: string }) {
+  const classes = useStyles(styles);
+  const { data } = useQuery(featuredPostQuery, { variables: { documentId } });
+  const post = data?.post?.result;
+  if (!post) return null;
+  return <section className={classes.featured} aria-label="Featured discussion">
+    <p className={classes.kicker}>Featured discussion · Local preview</p>
+    <h1 className={classes.title}><Link to={`/posts/${post._id}/${post.slug}`}>{post.title}</Link></h1>
+    <p className={classes.excerpt}>{post.contents?.plaintextDescription}</p>
+    <div className={classes.byline}>by {post.user?.displayName}<Link to={`/posts/${post._id}/${post.slug}`} className={classes.read}>Read discussion →</Link></div>
+  </section>;
+}
 
 export default function HumanStudyHome() {
   const classes = useStyles(styles);
+  const { forumType } = useForumType();
+  const featuredPostId = humanStudyFeaturedPostIdSetting.get(forumType);
   const [feed, setFeed] = useState<Feed>('new');
   const terms: PostsViewTerms = { view: 'new', sortedBy: feed === 'top' ? 'top' : 'new', limit: 20, ...(feed === 'questions' ? { question: true } : {}) };
   return <main className={classes.root}>
-    <section className={classes.hero} aria-labelledby="forum-title">
-      <p className={classes.eyebrow}>The HumanStudy community</p>
-      <h1 id="forum-title" className={classes.title}>Understanding people, together.</h1>
-      <p className={classes.description}>A place for questions, explanations, and evidence about people and society.</p>
-    </section>
-    <div className={classes.content}>
-      <section aria-label="Discussions" className={classes.discussions}>
+    <SingleColumnSection>
+      {featuredPostId && <SuspenseWrapper name="HumanStudyFeatured"><FeaturedDiscussion documentId={featuredPostId} /></SuspenseWrapper>}
+      <section aria-label="Discussions">
         <div className={classes.controls} role="tablist" aria-label="Discussion feed">
           {tabs.map(tab => <button key={tab.id} role="tab" aria-selected={feed === tab.id} className={classNames(classes.tab, feed === tab.id && classes.active)} onClick={() => setFeed(tab.id)}>{tab.label}</button>)}
+          <Link to="/newPost" className={classes.write}>Write a post</Link>
         </div>
         <PostsList2 key={feed} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
       </section>
-      <aside className={classes.aside}>
-        <Link to="/newPost" className={classes.write}>Start a discussion</Link>
-        <div className={classes.asideLinks}><h2>Explore the community</h2>
-        <Link to="/posts/hsExampleWelcome001/a-place-to-think-together" className={classes.link}>About the forum ↗</Link>
-        <Link to="/library" className={classes.link}>Reading collections ↗</Link>
-        <Link to="/allPosts" className={classes.link}>All discussions ↗</Link>
-        <a href="https://humanstudy-hub.com/studies" className={classes.link}>Explore studies ↗</a></div>
-        <div className={classes.footer}>Built on <a href="https://github.com/ForumMagnum/ForumMagnum">ForumMagnum</a>.<br />A home for thoughtful inquiry.</div>
-      </aside>
-    </div>
+      <footer className={classes.footer}>
+        <Link to="/posts/hsExampleWelcome001/a-place-to-think-together">About HumanStudy</Link>
+        <a href="https://humanstudy-hub.com">HumanStudy Hub ↗</a>
+        <a href="https://github.com/ForumMagnum/ForumMagnum">Powered by ForumMagnum</a>
+      </footer>
+    </SingleColumnSection>
   </main>;
 }

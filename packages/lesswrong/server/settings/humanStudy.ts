@@ -3,6 +3,7 @@ import { localSiteUrl } from './localSiteUrl';
 export const humanStudySettings = {
   forumType: 'LessWrong',
   humanStudyForum: true,
+  humanStudy: { featuredPostId: 'hsExampleReplicate002' },
   title: 'HumanStudy Forum',
   tagline: 'Understanding people and society, together.',
   siteNameWithArticle: 'HumanStudy Forum',

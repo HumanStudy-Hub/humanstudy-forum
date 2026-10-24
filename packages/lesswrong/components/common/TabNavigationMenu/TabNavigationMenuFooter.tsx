@@ -1,3 +1,4 @@
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { useForumType } from '@/components/hooks/useForumType';
 import React from 'react';
 import { AnalyticsContext } from "../../../lib/analyticsEvents";
@@ -40,7 +41,7 @@ const TabNavigationMenuFooter = () => {
     <div className={classes.wrapper}>
       <AnalyticsContext pageSectionContext="tabNavigationFooter">
         <div className={classes.root}>
-          {forumSelect(getMenuTabs(), forumType).map(tab => {
+          {forumSelect(getMenuTabs(humanStudyForumSetting.get(forumType)), forumType).map(tab => {
             if (!('showOnMobileStandalone' in tab) || !tab.showOnMobileStandalone) {
               return
             }
