@@ -89,3 +89,12 @@ schema where possible. The additive migration does not require dropping main-pro
 
 Scheduled jobs, full-text search, image hosting and collaborative editing remain separate
 feature configuration. Appoint a forum administrator and review moderation before wider launch.
+
+## Advisor review
+
+The session RPC intentionally uses a bounded SECURITY DEFINER lookup of `auth.sessions`:
+no arguments, authenticated-only EXECUTE, fixed empty search path, caller UUID and session ID
+both checked, boolean result only. Supabase's advisor flags authenticated callable definer
+functions; this is an intentional reviewed endpoint, not a generic permission bypass.
+The pre-existing leaked-password protection warning and ingestion-table no-policy information
+are unrelated to this migration. No paid security feature was enabled as part of this task.
