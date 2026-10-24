@@ -11,10 +11,10 @@ const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
     fontFamily: theme.palette.fonts.sansSerifStack,
     maxWidth: 1120,
     margin: '0 auto',
-    padding: '42px 36px 80px',
+    padding: '34px 36px 80px',
     [theme.breakpoints.down('sm')]: { padding: '28px 20px 60px' },
   },
-  hero: { paddingBottom: 30 },
+  hero: { paddingBottom: 26 },
   eyebrow: { color: theme.palette.primary.main, fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', margin: '0 0 12px' },
   title: { fontFamily: theme.palette.fonts.serifStack, color: theme.palette.text.primary, fontWeight: 400, fontSize: 34, lineHeight: 1.25, letterSpacing: '-.025em', margin: '0 0 10px', [theme.breakpoints.down('sm')]: { fontSize: 29 } },
   description: { color: theme.palette.text.secondary, fontSize: 14, lineHeight: 1.7, margin: 0 },
@@ -30,20 +30,20 @@ const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
     '& .LWPostsItem-bottomBorder': { borderBottom: theme.palette.greyBorder('1px', .09) },
     '& .LWPostsItem-postsItem': {
       display: 'grid',
-      gridTemplateColumns: '26px minmax(0, 1fr) auto auto',
+      gridTemplateColumns: '24px minmax(0, max-content) max-content minmax(0, 1fr)',
       columnGap: 12,
-      rowGap: 8,
-      padding: '23px 0',
+      rowGap: 6,
+      padding: '17px 0',
       alignItems: 'center',
     },
-    '& .LWPostsItem-title': {
-      '&&': { gridColumn: '2 / -1', gridRow: 1, minWidth: 0, width: 'auto', maxWidth: 'none', height: 'auto', minHeight: 0, overflow: 'visible', margin: 0, padding: 0, top: 0 },
+    '& .LWPostsItem-title.LWPostsItem-title': { gridColumn: '2 / -1', gridRow: 1, minWidth: 0, width: 'auto', maxWidth: 'none', height: 'auto', minHeight: 0, overflow: 'visible', margin: 0, padding: 0, top: 0,
     },
-    '& .PostsTitle-root': { fontSize: 22, lineHeight: 1.4, letterSpacing: '-.015em', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', marginRight: 0 },
+    '& .PostsTitle-root': { fontSize: 20, lineHeight: 1.4, letterSpacing: '-.01em', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', marginRight: 0 },
     '& .LWPostsItem-karma': { gridColumn: 1, gridRow: '1 / 3', alignSelf: 'start', paddingTop: 5, width: 'auto', margin: 0, color: theme.palette.text.secondary, fontSize: 12 },
-    '& .LWPostsItem-author': { '&&': { gridColumn: 2, gridRow: 2, flex: 'none', minWidth: 0, maxWidth: 'none', margin: 0, fontSize: 12, color: theme.palette.text.secondary } },
-    '& .PostsItemDate-postedAt': { '&&': { gridColumn: 3, gridRow: 2, width: 'auto', fontSize: 12, fontWeight: 400, color: theme.palette.text.secondary } },
-    '& .LWPostsItem-tertiaryRow': { gridColumn: 4, gridRow: 2, margin: 0 },
+    '& .LWPostsItem-author.LWPostsItem-author': { gridColumn: 2, gridRow: 2, flex: 'none', minWidth: 0, maxWidth: 180, margin: 0, fontSize: 12, color: theme.palette.text.secondary },
+    '& .LWPostsItem-postsItem > .LWTooltip-root:has(.PostsItemDate-postedAt)': { gridColumn: 3, gridRow: 2 },
+    '& .PostsItemDate-postedAt.PostsItemDate-postedAt': { width: 'auto', fontSize: 12, fontWeight: 400, color: theme.palette.text.secondary },
+    '& .LWPostsItem-tertiaryRow': { gridColumn: 4, gridRow: 2, margin: 0, justifyContent: 'flex-start' },
     '& .LWPostsItem-spacer, & .LWPostsItem-mobileSecondRowSpacer, & .LWPostsItem-mobileActions, & .LWPostsItem-mobileIcons': { display: 'none' },
     '& .PostsItemComments-commentsIconLarge': { display: 'flex', alignItems: 'center', gap: 5, width: 'auto', height: 18, top: 0, color: theme.palette.text.secondary },
     '& .PostsItemComments-commentCountIcon': { position: 'static', transform: 'none', width: 13, height: 13, opacity: .5 },
@@ -53,7 +53,7 @@ const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
   controls: { display: 'flex', gap: 24, borderBottom: theme.palette.greyBorder('1px', .13), paddingTop: 20 },
   tab: { border: 0, background: 'none', padding: '0 0 14px', font: 'inherit', fontSize: 13, color: theme.palette.text.secondary, cursor: 'pointer', borderBottom: '2px solid transparent', '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 4 } },
   active: { color: theme.palette.primary.main, borderBottomColor: theme.palette.primary.main, fontWeight: 600 },
-  aside: { paddingTop: 2, fontSize: 13, lineHeight: 1.8, color: theme.palette.text.secondary, '& h2': { fontFamily: theme.palette.fonts.serifStack, fontSize: 21, color: theme.palette.text.primary, fontWeight: 400, lineHeight: 1.4, margin: '0 0 12px' }, '& p': { margin: '0 0 24px' } },
+  aside: { paddingTop: 2, fontSize: 13, lineHeight: 1.8, color: theme.palette.text.secondary, '& h2': { fontFamily: theme.palette.fonts.sansSerifStack, fontSize: 12, color: theme.palette.text.primary, fontWeight: 600, lineHeight: 1.4, margin: '0 0 12px' }, '& p': { margin: '0 0 24px' } },
   write: { display: 'block', padding: '9px 16px', marginBottom: 30, border: `1px solid ${theme.palette.primary.main}`, borderRadius: 3, color: theme.palette.primary.main, textAlign: 'center', fontWeight: 500, fontSize: 13, '&:hover': { background: theme.palette.greyAlpha(.035) } },
   asideLinks: { borderTop: theme.palette.greyBorder('1px', .12), paddingTop: 17 },
   link: { display: 'block', padding: '5px 0', color: theme.palette.text.secondary, '&:hover': { color: theme.palette.primary.main } },
@@ -82,9 +82,9 @@ export default function HumanStudyHome() {
       </section>
       <aside className={classes.aside}>
         <Link to="/newPost" className={classes.write}>Start a discussion</Link>
-        <h2>Welcome to the conversation</h2>
-        <p>Bring a question, an observation, or an idea worth examining. Help each other understand it better.</p>
-        <div className={classes.asideLinks}><Link to="/library" className={classes.link}>Reading collections ↗</Link>
+        <div className={classes.asideLinks}><h2>Explore the community</h2>
+        <Link to="/posts/hsExampleWelcome001/a-place-to-think-together" className={classes.link}>About the forum ↗</Link>
+        <Link to="/library" className={classes.link}>Reading collections ↗</Link>
         <Link to="/allPosts" className={classes.link}>All discussions ↗</Link>
         <a href="https://humanstudy-hub.com/studies" className={classes.link}>Explore studies ↗</a></div>
         <div className={classes.footer}>Built on <a href="https://github.com/ForumMagnum/ForumMagnum">ForumMagnum</a>.<br />A home for thoughtful inquiry.</div>

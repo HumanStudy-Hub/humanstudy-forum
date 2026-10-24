@@ -83,9 +83,15 @@ Native feed rows use a two-line hierarchy: serif title, followed by author, date
 The outline writing button and quieter navigation retain the HumanStudy teal accent.
 No account, post, comment or sorting behavior changes in this refinement.
 
-Screenshots in this directory document the initial version, before this visual refinement.
-Codegen, project type checks and changed-file lint pass for the refinement. A fresh browser visual
-check is pending because browser access to the local preview was rejected by the browser tool.
+The initial screenshots remain for comparison. `home-refined-desktop.jpg` and
+`home-refined-mobile.jpg` show the corrected layout at 1280px and 375px. Both were checked in
+the browser with no horizontal overflow. Computed grid positions confirm titles on the first
+row and author, date and comments together on the second. The native Questions filter still
+returns the two question examples. Codegen, project type checks and changed-file lint pass.
+
+The correction removes nested selector repetition that prevented title/author placement and
+positions the date's tooltip wrapper, which is the actual grid child. Homepage titles are now
+20px with tighter spacing. Repeated welcome copy has been removed from the sidebar.
 
 ## Before opening a shared/public community
 
