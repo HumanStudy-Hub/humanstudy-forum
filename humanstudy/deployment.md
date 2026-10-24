@@ -12,6 +12,7 @@ The forum runs as a separate ForumMagnum application. The main website links to 
 - Intended custom domain: `forum.humanstudy-hub.com`
 - Dedicated Supabase project: `humanstudy-forum` (`cmcomuzjmiptqillffea`, us-west-1)
 - Database schema: upstream `schema/accepted_schema.sql`, initialized as `forum_initial_schema`
+- Permission hardening: `forum_api_permissions` revokes public view/RPC access and fixes function search paths
 - Database identity: `humanstudy-forum`
 
 No existing HumanStudy application tables, accounts or local testing data are imported.
@@ -42,6 +43,9 @@ roles. ForumMagnum authorizes requests through its native server; the dedicated 
 the forum tables but cannot create roles, databases or objects in the public schema.
 
 The email adapter uses Resend for this instance and leaves other upstream instances unchanged.
+The SMTP value returned by the existing Supabase project's configuration did not authenticate
+with Resend. A valid sending key is still needed; do not treat a populated environment variable
+as evidence of successful delivery. A configuration test was rejected and no email was sent.
 Verification and reset links derive from `HUMANSTUDY_SITE_URL`; change it and redeploy when moving
 to the custom domain. Add the DNS record Vercel recommends before changing the canonical URL.
 

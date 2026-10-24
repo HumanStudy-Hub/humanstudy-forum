@@ -3,8 +3,14 @@
 An independently runnable HumanStudy instance of the official
 [ForumMagnum](https://github.com/ForumMagnum/ForumMagnum) repository. Upstream source revision:
 `b453dfdafcbf86eaffafc0a581cfba131fbdb84c`. Branch: `codex/humanstudy-forum-v1`.
-The original GPL-3.0 LICENSE and upstream history remain intact. This is a local development
-preview, not a deployed forum or a replacement for HumanStudy's current production website.
+The original GPL-3.0 LICENSE and upstream history remain intact. The hosted forum is available at
+https://forum.humanstudy-hub.com. The main website's `/forum` entry redirects to this independent app.
+Local development remains available below. Deployment resources and configuration are documented
+in [deployment.md](deployment.md).
+
+The first hosted build and public discussion reading have passed verification. Email delivery
+still needs a valid Resend sending key; registration verification and password reset are not yet
+certified for this deployment. Native forum accounts are separate from HumanStudy Hub accounts.
 
 ## Product direction
 
