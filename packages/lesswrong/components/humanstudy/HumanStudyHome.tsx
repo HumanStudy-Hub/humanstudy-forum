@@ -29,8 +29,8 @@ const featuredPostQuery = gql(`
 const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
   root: { paddingBottom: 56 },
   featured: { background: theme.palette.panelBackground.translucent3, padding: '20px 24px', marginBottom: 28, [theme.breakpoints.down('sm')]: { padding: '18px 16px' } },
-  kicker: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, margin: '0 0 8px' },
-  title: { ...theme.typography.headerStyle, fontFamily: theme.palette.fonts.headerStack, fontSize: 25, fontWeight: 400, fontVariant: 'small-caps', lineHeight: 1.25, margin: '0 0 12px' },
+  kicker: { ...theme.typography.commentStyle, fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: theme.palette.primary.main, margin: '0 0 8px' },
+  title: { ...theme.typography.headerStyle, fontFamily: theme.palette.fonts.headerStack, fontSize: 28, fontWeight: 400, lineHeight: 1.25, margin: '0 0 12px' },
   excerpt: { ...theme.typography.commentStyle, fontSize: 15, lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
   read: { color: theme.palette.primary.main, marginLeft: 16 },
   byline: { ...theme.typography.commentStyle, fontSize: 13, color: theme.palette.text.dim3 },
@@ -50,7 +50,7 @@ function FeaturedDiscussion({ documentId }: { documentId: string }) {
   const post = data?.post?.result;
   if (!post) return null;
   return <section className={classes.featured} aria-label="Featured discussion">
-    <p className={classes.kicker}>Featured discussion · Local preview</p>
+    <p className={classes.kicker}>Field notes · Example discussion</p>
     <h1 className={classes.title}><Link to={`/posts/${post._id}/${post.slug}`}>{post.title}</Link></h1>
     <p className={classes.excerpt}>{post.contents?.plaintextDescription}</p>
     <div className={classes.byline}>by {post.user?.displayName}<Link to={`/posts/${post._id}/${post.slug}`} className={classes.read}>Read discussion →</Link></div>

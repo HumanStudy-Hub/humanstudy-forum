@@ -82,7 +82,7 @@ type MenuTab = MenuTabDivider | MenuTabCustomComponent | MenuTabRegular
 
 export const getMenuTabs = (humanStudy = false): ForumOptions<Array<MenuTab>> => ({
   LessWrong: humanStudy ? [
-    { id: 'home', title: 'Home', link: '/', icon: compassIcon, showOnMobileStandalone: true, showOnCompressed: true },
+    { id: 'home', title: 'Discussions', link: '/', iconComponent: SupervisedUserCircleIcon, showOnMobileStandalone: true, showOnCompressed: true },
     { id: 'allPosts', title: 'All Posts', link: '/allPosts', icon: allPostsIcon, showOnMobileStandalone: true, showOnCompressed: true },
     { id: 'library', title: 'Reading', link: '/library', iconComponent: BookIcon, showOnMobileStandalone: true, showOnCompressed: true },
     { id: 'about', title: 'About', link: '/posts/hsExampleWelcome001/a-place-to-think-together', iconComponent: AboutQuestionIcon, showOnMobileStandalone: true, showOnCompressed: true },

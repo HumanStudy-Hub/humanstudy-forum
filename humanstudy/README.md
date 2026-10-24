@@ -79,18 +79,19 @@ These checks used only synthetic local data. They do not certify a production de
 ## Current visual baseline
 
 The forum now uses upstream typography, native Header and navigation drawer/sidebar, native
-RouteRootClient column layout, original compact post rows and background illustration. The custom
+RouteRootClient column layout, original compact post rows. The custom
 header, large introduction, boxed feed and row CSS overrides have been removed. Only a restrained
 teal accent, four relevant navigation items and HumanStudy identity differ from the native chrome.
-Upstream seasonal banners are not shown for this instance. The inherited illustration is retained
-for this local design comparison; choose HumanStudy artwork before a public launch.
+Upstream background artwork and seasonal banners are not mounted for this instance. Our own
+Field notes illustration, teal wordmark and HumanStudy Hub palette establish the visual identity.
+See `art-direction.md` for the original artwork, generation prompt and integration details.
 
 The homepage uses native SingleColumnSection and PostsList2. A featured post is queried from the
 actual database through `humanStudy.featuredPostId`; its title, author and description are not a
 second hardcoded copy. The homepage shows a short reading preview with a link to the full article.
 No stored post content is changed or shortened. Set the featured ID to null to omit the feature.
 
-Current screenshot evidence: `home-native-desktop.jpg` and `home-native-mobile.jpg`. Earlier
+Current screenshot evidence: `home-branded-desktop.jpg` and `home-branded-mobile.jpg`. Earlier
 screenshots remain as iteration history. Browser checks at 1280px and 375px confirm native layouts,
 no horizontal overflow and a working Questions filter. Codegen, project types and changed-file lint
 pass. Search remains hidden because the search service has not been configured.

@@ -1,5 +1,7 @@
 'use client';
 
+import HumanStudyArtwork from '@/components/humanstudy/HumanStudyArtwork';
+
 import { useForumType } from '@/components/hooks/useForumType';
 import React, {useRef, useState, useCallback, createContext, useSyncExternalStore} from 'react';
 import classNames from 'classnames'
@@ -10,7 +12,7 @@ import { DialogManager } from '@/components/common/withDialog';
 import { CommentBoxManager } from '@/components/hooks/useCommentBox';
 import { ItemsReadContextWrapper } from '@/components/hooks/useRecordPostView';
 import { pBodyStyle } from '../../themes/stylePiping';
-import { googleTagManagerIdSetting } from '@/lib/instanceSettings';
+import { humanStudyForumSetting, googleTagManagerIdSetting } from '@/lib/instanceSettings';
 import { globalStyles } from '../../themes/globalStyles/globalStyles';
 import { excalidrawFontFaces } from '@/lib/lexical/excalidrawFontFaces';
 import { DisableNoKibitzContextProvider } from '@/components/common/sharedContexts';
@@ -177,6 +179,7 @@ const Layout = ({children}: {
 }) => {
   const { isLW, forumType } = useForumType();
   const classes = useStyles(styles);
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
   const googleTagManagerId = googleTagManagerIdSetting.get(forumType);
   const currentUser = useCurrentUser();
   const currentUserId = currentUser?._id;
@@ -254,7 +257,8 @@ const Layout = ({children}: {
                 <FlashMessages />
               </ErrorBoundary>
 
-              {isLW && <LWBackgroundImage />}
+              {isLW && !isHumanStudy && <LWBackgroundImage />}
+              {isHumanStudy && isHomeRoute(prerenderablePathname, forumType) && <HumanStudyArtwork />}
               <div ref={searchResultsAreaRef} className={classes.searchResultsArea} />
 
               {children}

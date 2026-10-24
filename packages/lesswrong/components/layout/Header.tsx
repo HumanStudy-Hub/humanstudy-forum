@@ -187,6 +187,7 @@ export const styles = defineStyles("Header", (theme: ThemeType) => ({
     top: 3,
     color: theme.palette.text.secondary,
   },
+  humanStudyWordmark: { fontFamily: theme.palette.fonts.headerStack, fontSize: 23, letterSpacing: '-.02em', color: theme.palette.primary.main, '& span': { fontStyle: 'italic' } },
   titleLink: {
     color: theme.palette.text.bannerAdOverlay,
     fontSize: 19,
@@ -563,13 +564,13 @@ const Header = ({
 
               <Typography className={classNames(classes.title, classes.hideXsDown)} variant="title">
                 <Link to="/" className={classes.titleLink}>
-                  {forumHeaderTitleSetting.get(forumType)}
+                  {humanStudyForumSetting.get(forumType) ? <span className={classes.humanStudyWordmark}>Human<span>Study</span></span> : forumHeaderTitleSetting.get(forumType)}
                 </Link>
                 <HeaderSubtitle />
               </Typography>
               <Typography className={classNames(classes.title, classes.hideSmUp)} variant="title">
                 <Link to="/" className={classes.titleLink}>
-                  {forumShortTitleSetting.get(forumType)}
+                  {humanStudyForumSetting.get(forumType) ? <span className={classes.humanStudyWordmark}>Human<span>Study</span></span> : forumShortTitleSetting.get(forumType)}
                 </Link>
               </Typography>
               {rightHeaderItemsNode}
