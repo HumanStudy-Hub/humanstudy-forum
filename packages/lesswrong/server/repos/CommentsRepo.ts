@@ -145,7 +145,7 @@ class CommentsRepo extends AbstractRepo<"Comments"> {
     return await this.getRawDb().manyOrNone(`
       -- CommentsRepo.getPopularPollComments
       SELECT c.*
-      FROM public."Comments" AS c
+      FROM "Comments" AS c
       WHERE c."parentCommentId" = $2
       ORDER BY c."baseScore" DESC
       LIMIT $1

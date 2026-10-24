@@ -109,6 +109,8 @@ export { forumTypeSetting, isLW, isEAForum, isAF };
 
 export const humanStudyFeaturedPostIdSetting = new PublicInstanceSetting<string | null>('humanStudy.featuredPostId', null, 'optional');
 
+export const humanStudyHubAuthSetting = new PublicInstanceSetting<boolean>('humanStudyHubAuth', false, 'optional');
+export const humanStudyHubAuthOriginSetting = new PublicInstanceSetting<string>('humanStudyHubAuthOrigin', 'https://humanstudy-hub.com', 'optional');
 export const humanStudyForumSetting = new PublicInstanceSetting<boolean>('humanStudyForum', false, 'optional');
 
 export const forumTitleSetting = new PublicInstanceSetting<string>('title', 'LessWrong', 'warning') // Default title for URLs

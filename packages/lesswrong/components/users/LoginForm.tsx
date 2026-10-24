@@ -1,6 +1,6 @@
 import { useForumType } from '@/components/hooks/useForumType';
 import React, { useCallback, useRef, useState } from 'react';
-import { humanStudyForumSetting, reCaptchaSiteKeySetting } from '../../lib/instanceSettings';
+import { humanStudyHubAuthSetting, humanStudyHubAuthOriginSetting, humanStudyForumSetting, reCaptchaSiteKeySetting } from '../../lib/instanceSettings';
 import { useMutation } from "@apollo/client/react";
 import { gql } from '@/lib/generated/gql-codegen';
 import { useMessages } from '../common/withMessages';
@@ -13,6 +13,8 @@ import SignupSubscribeToCurated from "./SignupSubscribeToCurated";
 import DeferRender from '../common/DeferRender';
 import { ErrorLike } from '@apollo/client';
 import { defineStyles, useStyles } from '../hooks/useStyles.tsx';
+import { getSiteUrl } from '@/lib/vulcan-lib/utils';
+import { forumReturnPath, hubAccountUrl } from '@/lib/auth/hubAuthLinks';
 import { sanitizeLoginReturnTo } from '@/lib/auth/loginNotices';
 
 const styles = defineStyles('LoginForm', (theme: ThemeType) => ({
@@ -209,6 +211,14 @@ const LoginForm = ({ startingState = "login", returnTo, autoFocus = false }: {
   }
 
   const oauthReturnTo = encodeURIComponent(sanitizeLoginReturnTo(returnTo ?? pathname));
+
+  if (humanStudyHubAuthSetting.get(forumType)) {
+    const path = forumReturnPath(returnTo ?? pathname);
+    const target = hubAccountUrl(humanStudyHubAuthOriginSetting.get(forumType), new URL(path, getSiteUrl(forumType)).toString());
+    return <ContentStyles contentType="commentExceptPointerEvents"><div className={classes.root}>
+      <a className={classes.primaryBtn} href={target}>Continue with HumanStudy</a>
+    </div></ContentStyles>;
+  }
 
   return <ContentStyles contentType="commentExceptPointerEvents">
     {reCaptchaSiteKey && <DeferRender ssr={false}>

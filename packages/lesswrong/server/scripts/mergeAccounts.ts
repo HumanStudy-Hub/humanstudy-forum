@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import Users from '../../server/collections/users/collection';
 import { Revisions } from '../../server/collections/revisions/collection';
 import { getEditableFieldNamesForCollection, editableFieldIsNormalized } from '@/server/editor/editableSchemaFieldHelpers';
@@ -331,6 +332,7 @@ export const mergeAccounts = async ({sourceUserId, targetUserId, dryRun, deadlin
   dryRun: boolean,
   deadlineAt?: number
 }): Promise<MergeAccountsResult> => {
+  if (usesHubAuth()) throw new Error('Shared HumanStudy accounts must be managed centrally. Native forum account merging is unavailable.');
   if (typeof dryRun !== "boolean") throw Error("dryRun value missing")
   const failures: MergeAccountsFailure[] = []
 

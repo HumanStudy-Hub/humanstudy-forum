@@ -1,3 +1,4 @@
+import { usesHubAuth, requireNativeAuth } from '@/server/authentication/hubAuth';
 import type { ForumTypeString } from '@/lib/instanceSettings';
 import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
 import { getSiteUrl } from '../../lib/vulcan-lib/utils';
@@ -135,6 +136,7 @@ async function getAndValidateToken(token: string) {
  */
 export async function executeEmailToken(token: string, context: ResolverContext, args?: any): Promise<UseEmailTokenResult & { userId: string }> {
   const { tokenObj, tokenType } = await getAndValidateToken(token);
+  if (usesHubAuth() && ['resetPassword', 'verifyEmail'].includes(tokenObj.tokenType)) requireNativeAuth();
   const tokenContext = createAnonymousContext({forumType: context.forumType});
   const resultProps = await tokenType.handleToken(tokenObj, args, tokenContext);
   await updateEmailToken({

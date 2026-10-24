@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { captureException } from "@/lib/sentryWrapper";
 import { exchangeCodeForToken, OAuthError } from "@/server/oauth/oauthProvider";
 import { NextResponse, type NextRequest } from "next/server";
@@ -34,6 +35,7 @@ function parseBasicAuthorizationHeader(headerValue: string | null): BasicAuthCre
 }
 
 export async function POST(req: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use HumanStudy account authentication.' }, { status: 403 });
   try {
     const contentType = req.headers.get("content-type") ?? "";
     let params: Record<string, string>;

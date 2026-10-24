@@ -77,6 +77,10 @@ export const concat = (queries: Query<any>[]): string => {
  * for connecting extenal clients for debugging/testing/migrations/etc.
  */
 const MAX_CONNECTIONS = parseInt(process.env.PG_MAX_CONNECTIONS ?? "25");
+const databaseSchema = process.env.PG_SCHEMA;
+if (databaseSchema && !/^[a-z_][a-z0-9_]*$/.test(databaseSchema)) {
+  throw new Error('PG_SCHEMA must be a PostgreSQL schema identifier.');
+}
 
 const queryMethods = [
   "none",
@@ -243,6 +247,7 @@ function getWrappedClient(
   const pgpInstance = getPgPromiseLib();
   const db = pgpInstance({
     connectionString: url,
+    ...(databaseSchema ? { options: `-c search_path=${databaseSchema},extensions` } : {}),
     ...(process.env.PG_SSL_CA ? { ssl: { ca: process.env.PG_SSL_CA, rejectUnauthorized: true } } : {}),
     max: MAX_CONNECTIONS,
     // Trying a relatively shorter idle timeout to see if it reduces the connection starvation we see during deploys on Vercel

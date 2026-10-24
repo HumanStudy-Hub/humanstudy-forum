@@ -1,3 +1,4 @@
+import { requireNativeAuth } from '@/server/authentication/hubAuth';
 import type { ForumTypeString } from "@/lib/instanceSettings";
 import React from 'react'
 import { randomBytes } from "crypto";
@@ -42,6 +43,7 @@ type AuthenticateWithPasswordResult = {
 };
 
 async function authenticateWithPassword(username: string, password: string): Promise<AuthenticateWithPasswordResult> {
+  requireNativeAuth();
   const user = await new UsersRepo().getUserByUsernameOrEmail(username);
 
   if (!user) return { success: false, message: 'Invalid login.' }; //Don't reveal that an email exists in DB
@@ -108,6 +110,7 @@ function isValidCharInUsername(ch: string): boolean {
 }
 
 export async function createAndSetToken(headers: Headers|undefined, user: DbUser, forumType: ForumTypeString) {
+  requireNativeAuth();
   const { cookies } = await import('next/headers');
 
   const token = randomBytes(32).toString('hex');
@@ -158,6 +161,7 @@ export const loginDataGraphQLMutations = {
     return { token }
   },
   async logout(root: void, args: {}, context: ResolverContext) {
+    requireNativeAuth();
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     for (const cookieName of ["loginToken", "meteor_login_token"]) {
@@ -173,6 +177,7 @@ export const loginDataGraphQLMutations = {
     }
   },
   async signup(root: void, args: AnyBecauseTodo, context: ResolverContext) {
+    requireNativeAuth();
     const { email, username, password, subscribeToCurated, reCaptchaToken, abTestKey } = args;
     
     if (!email || !username || !password) throw Error("Email, Username and Password are all required for signup")
@@ -245,6 +250,7 @@ export const loginDataGraphQLMutations = {
     }
   },
   async resetPassword(root: void, { email }: {email: string}, context: ResolverContext) {
+    requireNativeAuth();
     if (!email) throw Error("Email is required for resetting passwords")
     const user = await userFindOneByEmail(email)
     if (!user) throw Error("Can't find user with given email address")

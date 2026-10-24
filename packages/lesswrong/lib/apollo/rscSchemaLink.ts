@@ -1,4 +1,5 @@
 import { computeContextFromUser } from "@/server/vulcan-lib/apollo-server/context";
+import { getHubUser, usesHubAuth } from '@/server/authentication/hubAuth';
 import { getUser } from "@/server/vulcan-lib/apollo-server/getUserFromReq";
 import { SchemaLink } from "@apollo/client/link/schema";
 import type { GraphQLSchema } from "graphql";
@@ -12,7 +13,9 @@ export const rscSchemaLink = (schema: GraphQLSchema) => {
       headers(),
     ]);
 
-    const user = await getUser(cookieStore.get("loginToken")?.value ?? null);
+    const user = usesHubAuth()
+      ? await getHubUser(cookieStore.get('hub_access')?.value)
+      : await getUser(cookieStore.get('loginToken')?.value ?? null);
 
     const context = computeContextFromUser({
       user,

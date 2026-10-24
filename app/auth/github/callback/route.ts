@@ -1,3 +1,4 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
 import { getForumTypeForRequest } from "@/server/utils/requestUtil";
 import { getContextFromReqAndRes } from "@/server/vulcan-lib/apollo-server/context";
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,6 +13,7 @@ import { getLoginErrorUrl, getLoginWarningUrl, loginErrorCodes, loginWarningCode
 
 
 export async function GET(request: NextRequest) {
+  if (usesHubAuth()) return NextResponse.json({ error: 'Use your HumanStudy account to sign in.' }, { status: 403 });
   const siteUrl = getSiteUrlFromReq(request);
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');

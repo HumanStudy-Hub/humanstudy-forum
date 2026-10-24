@@ -1,3 +1,5 @@
+import { usesHubAuth } from '@/server/authentication/hubAuth';
+import { hubAccountUrl } from '@/lib/auth/hubAuthLinks';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getSiteUrlFromReq } from '@/server/utils/getSiteUrl';
@@ -7,6 +9,12 @@ import { invalidateLoginToken } from '@/server/vulcan-lib/apollo-server/authenti
 const loginTokenCookieNames = ['meteor_login_token', 'loginToken'];
 
 export async function GET(request: NextRequest) {
+  if (usesHubAuth()) {
+    const hubOrigin = process.env.HUB_AUTH_ORIGIN;
+    const siteUrl = process.env.HUMANSTUDY_SITE_URL;
+    if (!hubOrigin || !siteUrl) throw new Error('Shared HumanStudy authentication is not configured.');
+    return NextResponse.redirect(hubAccountUrl(hubOrigin, siteUrl, 'logout'));
+  }
   const cookieStore = await cookies();
   const siteUrl = getSiteUrlFromReq(request);
 

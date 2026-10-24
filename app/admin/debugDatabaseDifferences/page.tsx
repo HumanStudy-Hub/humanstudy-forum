@@ -6,6 +6,7 @@ import { readFile } from "fs/promises";
 import RouteRoot from "@/components/layout/RouteRoot";
 import { assertRouteAttributes } from "@/lib/routeChecks/assertRouteAttributes";
 import { getDefaultMetadata, getPageTitleFields } from "@/server/pageMetadata/sharedMetadata";
+import { getHubUser, usesHubAuth } from '@/server/authentication/hubAuth';
 import { getUser } from "@/server/vulcan-lib/apollo-server/getUserFromReq";
 import { userIsAdmin } from "@/lib/vulcan-users/permissions";
 import { getSqlClientOrThrow } from "@/server/sql/sqlClient";
@@ -76,6 +77,7 @@ const getLoginTokenFromRequest = async (): Promise<string | null> => {
 };
 
 const loadCurrentUser = async (): Promise<DbUser | null> => {
+  if (usesHubAuth()) return getHubUser((await cookies()).get('hub_access')?.value);
   const token = await getLoginTokenFromRequest();
   return await getUser(token);
 };

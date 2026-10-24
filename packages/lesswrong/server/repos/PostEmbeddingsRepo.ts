@@ -85,7 +85,7 @@ class PostEmbeddingsRepo extends AbstractRepo<"PostEmbeddings"> {
         SELECT
           pe."postId", 
           pe.embeddings <#> $(inputEmbedding)::VECTOR(1536) AS distance
-        FROM public."PostEmbeddings" pe
+        FROM "PostEmbeddings" pe
         ${eligibilityFilter}
         ORDER BY distance
         LIMIT 200 
@@ -104,14 +104,14 @@ class PostEmbeddingsRepo extends AbstractRepo<"PostEmbeddings"> {
       -- PostEmbeddingsRepo.getNearestPostsWeightedByQualityByPostId
       WITH source_embedding AS (
         SELECT embeddings
-        FROM public."PostEmbeddings"
+        FROM "PostEmbeddings"
         WHERE "postId" = $(postId)
       ),
       embedding_distances AS (
         SELECT
           pe."postId", 
           pe.embeddings <#> (SELECT embeddings FROM source_embedding) AS distance
-        FROM public."PostEmbeddings" pe
+        FROM "PostEmbeddings" pe
         WHERE pe."postId" != $(postId)
         ORDER BY distance
         LIMIT 200 

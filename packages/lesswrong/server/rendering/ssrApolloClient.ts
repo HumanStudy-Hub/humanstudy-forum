@@ -1,4 +1,7 @@
 import { computeContextFromUser } from "@/server/vulcan-lib/apollo-server/context";
+import { usesHubAuth, verifyHubSession, getForumUserForHubIdentity } from '@/server/authentication/hubAuth';
+import { redirect } from 'next/navigation';
+import { forumReturnPath } from '@/lib/auth/hubAuthLinks';
 import { getUser } from "@/server/vulcan-lib/apollo-server/getUserFromReq";
 import { LoggedOutCacheLink } from "@/server/rendering/loggedOutCacheLink";
 import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
@@ -35,7 +38,17 @@ async function createResolverContextForSSR(searchParamsStr: string): Promise<Res
     headers(),
   ]);
   const loginToken = serverCookies.get("loginToken")?.value ?? null;
-  const user = await getUser(loginToken);
+  let user: DbUser | null;
+  if (usesHubAuth()) {
+    const session = await verifyHubSession(serverCookies.get('hub_access')?.value);
+    if ((session.status === 'expired' || !serverCookies.get('hub_access')?.value) && serverCookies.get('hub_refresh')?.value) {
+      const path = forumReturnPath(serverHeaders.get('x-hsh-request-path'));
+      redirect(`/auth/hub/refresh?returnTo=${encodeURIComponent(path)}`);
+    }
+    user = session.status === 'authenticated' ? await getForumUserForHubIdentity(session.identity) : null;
+  } else {
+    user = await getUser(loginToken);
+  }
 
   return computeContextFromUser({
     user,
