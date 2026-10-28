@@ -28,7 +28,7 @@ const featuredPostQuery = gql(`
 
 const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
   root: { paddingBottom: 56 },
-  featured: { background: theme.palette.panelBackground.translucent3, padding: '20px 24px', marginBottom: 28, [theme.breakpoints.down('sm')]: { padding: '18px 16px' } },
+  featured: { background: theme.palette.panelBackground.translucent3, padding: '20px 24px', marginTop: 28, [theme.breakpoints.down('sm')]: { padding: '18px 16px' } },
   kicker: { ...theme.typography.commentStyle, fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: theme.palette.primary.main, margin: '0 0 8px' },
   title: { ...theme.typography.headerStyle, fontFamily: theme.palette.fonts.headerStack, fontSize: 28, fontWeight: 400, lineHeight: 1.25, margin: '0 0 12px' },
   excerpt: { ...theme.typography.commentStyle, fontSize: 15, lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
@@ -37,11 +37,12 @@ const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
   controls: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' },
   tab: { ...theme.typography.commentStyle, fontSize: 13, border: 0, borderRadius: 2, padding: '6px 16px', background: theme.palette.panelBackground.default, color: theme.palette.text.dim3, cursor: 'pointer', '&:hover': { color: theme.palette.text.normal } },
   active: { background: theme.palette.primary.main, color: theme.palette.primary.contrastText, '&:hover': { color: theme.palette.primary.contrastText } },
-  write: { ...theme.typography.commentStyle, marginLeft: 'auto', fontSize: 13, padding: '6px 0 6px 12px', color: theme.palette.text.dim3, '&:hover': { color: theme.palette.primary.main } },
+  sort: { ...theme.typography.commentStyle, marginLeft: 'auto', fontSize: 13, padding: '6px 8px', border: 0, background: theme.palette.panelBackground.default, color: theme.palette.text.dim3 },
+  write: { ...theme.typography.commentStyle, fontSize: 13, padding: '6px 12px', color: theme.palette.primary.main, '&:hover': { textDecoration: 'underline' } },
   footer: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: '8px 20px' },
 }));
 
-const tabs = [{ id: 'new', label: 'Recent' }, { id: 'top', label: 'Top' }, { id: 'questions', label: 'Questions' }] as const;
+const tabs = [{ id: 'questions', label: 'Questions' }, { id: 'discussions', label: 'Discussions & articles' }] as const;
 type Feed = typeof tabs[number]['id'];
 
 function FeaturedDiscussion({ documentId }: { documentId: string }) {
@@ -61,18 +62,23 @@ export default function HumanStudyHome() {
   const classes = useStyles(styles);
   const { forumType } = useForumType();
   const featuredPostId = humanStudyFeaturedPostIdSetting.get(forumType);
-  const [feed, setFeed] = useState<Feed>('new');
-  const terms: PostsViewTerms = { view: 'new', sortedBy: feed === 'top' ? 'top' : 'new', limit: 20, ...(feed === 'questions' ? { question: true } : {}) };
+  const [feed, setFeed] = useState<Feed>('questions');
+  const [sort, setSort] = useState<'new' | 'top'>('new');
+  const terms: PostsViewTerms = { view: sort, limit: 20, question: feed === 'questions' };
   return <main className={classes.root}>
     <SingleColumnSection>
-      {featuredPostId && <SuspenseWrapper name="HumanStudyFeatured"><FeaturedDiscussion documentId={featuredPostId} /></SuspenseWrapper>}
-      <section aria-label="Discussions">
-        <div className={classes.controls} role="tablist" aria-label="Discussion feed">
-          {tabs.map(tab => <button key={tab.id} role="tab" aria-selected={feed === tab.id} className={classNames(classes.tab, feed === tab.id && classes.active)} onClick={() => setFeed(tab.id)}>{tab.label}</button>)}
-          <Link to="/newPost" className={classes.write}>Write a post</Link>
+      <section aria-label="Community">
+        <div className={classes.controls}>
+          {tabs.map(tab => <button key={tab.id} aria-pressed={feed === tab.id} className={classNames(classes.tab, feed === tab.id && classes.active)} onClick={() => setFeed(tab.id)}>{tab.label}</button>)}
+          <select aria-label="Sort posts" className={classes.sort} value={sort} onChange={event => setSort(event.target.value === 'top' ? 'top' : 'new')}>
+            <option value="new">Recent</option>
+            <option value="top">Top</option>
+          </select>
+          <Link to={feed === 'questions' ? '/newPost?category=question' : '/newPost'} className={classes.write}>{feed === 'questions' ? 'Ask a question' : 'Write a post'}</Link>
         </div>
-        <PostsList2 key={feed} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
+        <PostsList2 key={`${feed}-${sort}`} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
       </section>
+      {feed === 'discussions' && featuredPostId && <SuspenseWrapper name="HumanStudyFeatured"><FeaturedDiscussion documentId={featuredPostId} /></SuspenseWrapper>}
       <footer className={classes.footer}>
         <Link to="/posts/hsExampleWelcome001/a-place-to-think-together">About HumanStudy</Link>
         <a href="https://humanstudy-hub.com">HumanStudy Hub ↗</a>
