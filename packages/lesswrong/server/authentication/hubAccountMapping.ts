@@ -17,7 +17,9 @@ export function getOrCreateHubForumUserId(db: Pick<SqlClient, 'tx'>, identity: H
       return existing.forum_user_id;
     }
     const id = randomId();
-    const username = `researcher-${id}`;
+    // Profile URLs are looked up by slugify(slug), which lowercases; a mixed-case
+    // slug would make the profile page 404.
+    const username = `researcher-${id.toLowerCase()}`;
     await transaction.none(`INSERT INTO "Users" (_id, slug, username, "displayName", email, emails, services, "isAdmin", "abTestKey")
       VALUES ($1, $2, $2, $3, $4, ARRAY[jsonb_build_object('address', $4::text, 'verified', true)], '{}'::jsonb, false, $1)`, [id, username, identity.displayName, identity.email]);
     await transaction.none('INSERT INTO "HumanStudyAccounts" (auth_user_id, forum_user_id) VALUES ($1, $2)', [identity.id, id]);

@@ -1,5 +1,6 @@
 import pgPromise from 'pg-promise';
 import { getOrCreateHubForumUserId } from '../server/authentication/hubAccountMapping';
+import { slugify } from '../lib/utils/slugify';
 
 const pgp = pgPromise();
 const testUrl = process.env.HUB_AUTH_TEST_PG_URL ?? process.env.PG_URL;
@@ -60,6 +61,15 @@ describe('shared forum identity ownership', () => {
       expect(profile.email).toBe('changed@example.invalid');
       expect(profile.isAdmin).toBe(false);
       expect(profile.services).toEqual({});
+    });
+  });
+
+  it('creates a slug that the profile route can resolve', async () => {
+    await db.tx(async transaction => {
+      await prepareTemporaryTables(transaction);
+      const userId = await getOrCreateHubForumUserId(transaction, firstIdentity);
+      const { slug } = await transaction.one<{ slug: string }>('SELECT slug FROM "Users" WHERE _id = $1', [userId]);
+      expect(slugify(slug)).toBe(slug);
     });
   });
 });
