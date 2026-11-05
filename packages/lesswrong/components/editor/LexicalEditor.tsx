@@ -17,6 +17,7 @@ import { useCurrentUser } from '../common/withUser';
 import WarningBanner from '../common/WarningBanner';
 import { useClientId } from '../hooks/useClientId';
 import { fetchHocuspocusToken, type CollaborationConfig } from '../lexical/collaboration';
+import { isCollaborationServerConfigured } from '../../lib/editor/collaborationServer';
 import { useApolloClient } from '@apollo/client/react';
 import { useLocation } from '@/lib/routeUtil';
 import Editor from '../lexical/Editor';
@@ -404,7 +405,12 @@ const LexicalEditor = ({
   // use the same Yjs/Hocuspocus path.
   // This ensures we always use Yjs for consistency, even when not sharing with others.
   // Anonymous users can collaborate if they have a clientId (from cookie).
-  const shouldEnableCollaboration = !!collaborationCollectionName && !!documentId;
+  // Without a configured Hocuspocus server, posts fall back to single-author
+  // editing (initial HTML in, HTML out through onChange, saved by the form
+  // submit). ResearchDocuments have no form-submit save path, so they keep
+  // requiring the server rather than silently dropping edits.
+  const shouldEnableCollaboration = !!collaborationCollectionName && !!documentId
+    && (collaborationCollectionName !== 'Posts' || isCollaborationServerConfigured());
 
   // Build collaboration config directly -- no initial auth query needed.
   // The wsUrl is a build-time constant, the documentName is derived from the collection/document id,
