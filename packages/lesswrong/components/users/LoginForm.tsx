@@ -79,10 +79,12 @@ const styles = defineStyles('LoginForm', (theme: ThemeType) => ({
     textTransform: 'uppercase'
   },
   primaryBtn: {
+    display: 'block',
+    textAlign: 'center',
     background: theme.palette.primary.main,
     color: `${theme.palette.buttons.primaryDarkText} !important`,
     fontSize: '0.9em',
-    padding: '6px 12px',
+    padding: '8px 12px',
     textTransform: 'uppercase',
     borderRadius: 4
   },
