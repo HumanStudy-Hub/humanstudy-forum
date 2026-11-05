@@ -50,7 +50,7 @@ function FeaturedDiscussion({ documentId }: { documentId: string }) {
   const post = data?.post?.result;
   if (!post) return null;
   return <section className={classes.featured} aria-label="Featured discussion">
-    <p className={classes.kicker}>Field notes · Example discussion</p>
+    <p className={classes.kicker}>Featured discussion</p>
     <h1 className={classes.title}><Link to={`/posts/${post._id}/${post.slug}`}>{post.title}</Link></h1>
     <p className={classes.excerpt}>{post.contents?.plaintextDescription}</p>
     <div className={classes.byline}>by {post.user?.displayName}<Link to={`/posts/${post._id}/${post.slug}`} className={classes.read}>Read discussion →</Link></div>
@@ -74,7 +74,6 @@ export default function HumanStudyHome() {
         <PostsList2 key={feed} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
       </section>
       <footer className={classes.footer}>
-        <Link to="/posts/hsExampleWelcome001/a-place-to-think-together">About HumanStudy</Link>
         <a href="https://humanstudy-hub.com">HumanStudy Hub ↗</a>
         <a href="https://github.com/ForumMagnum/ForumMagnum">Powered by ForumMagnum</a>
       </footer>

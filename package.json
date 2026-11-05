@@ -47,8 +47,7 @@
     "unused-jss-classes": "ts-node --swc -r tsconfig-paths/register scripts/unusedJssClasses.ts",
     "next-start": "NODE_OPTIONS='--inspect --no-deprecation --enable-source-maps' next start",
     "humanstudy:setup": "node scripts/humanstudy-setup.mjs",
-    "humanstudy:dev": "node scripts/humanstudy-dev.mjs",
-    "humanstudy:seed": "node scripts/humanstudy-seed.mjs"
+    "humanstudy:dev": "node scripts/humanstudy-dev.mjs"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.84",
