@@ -5,6 +5,7 @@ import { userCanCreateCommitMessages } from '../../lib/betas';
 import { useCurrentUser } from '../common/withUser';
 import { Editor, EditorChangeEvent, getUserDefaultEditor, getInitialEditorContents, getBlankEditorContents, EditorContents, isBlank, EditorTypeString, styles, shouldSubmitContents, isValidEditorType, autosaveInterval, type LegacyEditorTypeString } from './Editor';
 import { isCollaborative, PostCategory } from '../../lib/collections/posts/helpers';
+import { isCollaborationServerConfigured } from '../../lib/editor/collaborationServer';
 import { DynamicTableOfContentsContext } from '../common/sharedContexts';
 import { AppendToEditorContext } from './AppendToEditorContext';
 import { useDebouncedCallback, useStabilizedCallback } from '../hooks/useDebouncedCallback';
@@ -206,6 +207,7 @@ function InnerEditorFormComponent<S, R>({
     && fieldName === 'contents'
     && currentEditorType === 'lexical'
     && !!document?._id
+    && isCollaborationServerConfigured()
   );
   const suppressLocalStorageRestore = isCollabEditor || isLexicalCollaborativeDocument;
 
