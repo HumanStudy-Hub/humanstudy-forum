@@ -405,10 +405,12 @@ const LexicalEditor = ({
   // use the same Yjs/Hocuspocus path.
   // This ensures we always use Yjs for consistency, even when not sharing with others.
   // Anonymous users can collaborate if they have a clientId (from cookie).
-  // Without a configured Hocuspocus server, fall back to single-author editing
-  // (initial HTML in, HTML out through onChange, saved by the form submit).
+  // Without a configured Hocuspocus server, posts fall back to single-author
+  // editing (initial HTML in, HTML out through onChange, saved by the form
+  // submit). ResearchDocuments have no form-submit save path, so they keep
+  // requiring the server rather than silently dropping edits.
   const shouldEnableCollaboration = !!collaborationCollectionName && !!documentId
-    && isCollaborationServerConfigured();
+    && (collaborationCollectionName !== 'Posts' || isCollaborationServerConfigured());
 
   // Build collaboration config directly -- no initial auth query needed.
   // The wsUrl is a build-time constant, the documentName is derived from the collection/document id,
