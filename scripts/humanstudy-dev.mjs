@@ -37,7 +37,6 @@ try {
       await new Promise(resolve => setTimeout(resolve, 250));
     }
   }
-  await runOnce('scripts/humanstudy-seed.mjs');
   await runOnce('.humanstudy-tools/node_modules/yarn/bin/yarn.js', ['generate']);
   console.log(`HumanStudy Forum: http://127.0.0.1:${port}`);
   await runOnce('node_modules/next/dist/bin/next', ['dev', '--hostname', '127.0.0.1', '--port', String(port)]);

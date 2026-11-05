@@ -48,13 +48,12 @@ server dependencies. The dev command runs upstream codegen and starts Next direc
 The local database is PGlite (Postgres WASM) with the official accepted schema, extensions and
 socket adapter. It is only a local development convenience. Use dedicated native PostgreSQL with
 pgvector and upstream connection-pool settings for a shared or production deployment. Do not
-point this seed command at production; it requires both localhost and the humanstudy-local identity.
+point the local database at production.
 
-Five editable example discussions are seeded idempotently. Each is labeled as an example and
-attributed to Example researcher. No votes, comments or community activity are invented. Original
-example content lives in `humanstudy/examples.json`; remove demo content through a reviewed
-migration before a public launch. Synthetic integration accounts/private drafts may also exist
-in the local data folder; none is copied into Git.
+No example content is seeded; a fresh local database starts with no posts. The former Example
+researcher posts were removed (see `humanstudy/sql/remove-example-posts.sql` for existing
+databases). Synthetic integration accounts/private drafts may also exist in the local data folder;
+none is copied into Git.
 
 ## Where to extend
 
@@ -66,7 +65,7 @@ in the local data folder; none is copied into Git.
 | Homepage and native post feed | `packages/lesswrong/components/humanstudy/HumanStudyHome.tsx` |
 | Reading collections | `packages/lesswrong/components/humanstudy/HumanStudyReading.tsx` |
 | Scoped document/readability CSS | `app/humanstudy.css` |
-| Startup and local fixtures | `scripts/humanstudy-*.mjs`, `humanstudy/examples.json` |
+| Startup and local fixtures | `scripts/humanstudy-*.mjs` |
 
 The upstream forum-type enum remains LessWrong, retaining native behavior. `ENV_NAME=humanstudy`
 selects the instance, and `humanStudyForum` selects the lightweight interface/theme. Other upstream
@@ -99,7 +98,7 @@ See `art-direction.md` for the original artwork, generation prompt and integrati
 The homepage uses native SingleColumnSection and PostsList2. A featured post is queried from the
 actual database through `humanStudy.featuredPostId`; its title, author and description are not a
 second hardcoded copy. The homepage shows a short reading preview with a link to the full article.
-No stored post content is changed or shortened. Set the featured ID to null to omit the feature.
+No stored post content is changed or shortened. It is currently null, so no featured post is shown.
 
 Current screenshot evidence: `home-branded-desktop.jpg` and `home-branded-mobile.jpg`. Earlier
 screenshots remain as iteration history. Browser checks at 1280px and 375px confirm native layouts,
