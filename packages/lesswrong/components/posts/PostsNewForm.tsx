@@ -193,7 +193,14 @@ function isUntouchedBlankDraft(post: PostsEditMutationFragment, userId: string) 
     && !!post.draft
     && !post.deletedDraft
     && post.title === "Untitled Draft"
-    && !post.contents?.wordCount;
+    && isBlankHtml(post.contents?.html);
+}
+
+// wordCount reports 1 for an empty document, so check the HTML itself.
+function isBlankHtml(html: string | null | undefined) {
+  if (!html) return true;
+  if (/<(img|iframe|figure|video|audio|embed|object)\b/i.test(html)) return false;
+  return html.replace(/<[^>]*>/g, "").replace(/&nbsp;|\u00a0/g, "").trim() === "";
 }
 
 const PostsNewForm = () => {
