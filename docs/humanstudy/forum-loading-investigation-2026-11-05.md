@@ -21,7 +21,7 @@ This is a proven isolation defect, not proof that it explains every observed del
 - Browser warnings only: gtag called before dataLayer initialization. No evidence this caused the delay.
 
 ## Validation limits / next diagnosis
-Typecheck cannot complete in this fresh worktree because generated `.next/types/routes` and Excalidraw font artifacts are absent. ESLint fails before checking files due to installed ESLint8 loading an ESM stylistic plugin under local Node20. No errors from changed files appeared in the typecheck output. Do not treat these as full green checks.
+Typecheck cannot complete in this fresh worktree because generated `.next/types/routes` and Excalidraw font artifacts are absent. ESLint fails before checking files due to installed ESLint8 loading an ESM stylistic plugin under local Node20. Do not treat these as full green checks.
 
 Keep investigating cold versus warm requests, connection acquisition, and logged-in shared-auth latency separately. Do not change auth validation/caching, weaken session revocation, increase database spend, or declare the loading issue resolved based on these observations alone.
 

@@ -3,7 +3,7 @@ import { type SourceLocation } from "graphql";
 import { onError } from '@apollo/client/link/error';
 import { isServer } from '../executionEnvironment';
 import { graphqlBatchMaxSetting } from '../instanceSettings';
-import { ApolloLink } from "@apollo/client/core";
+import { ApolloLink, type Operation } from "@apollo/client/core";
 import { HttpLink } from "@apollo/client/link/http";
 import { crosspostUserAgent } from "./constants";
 import { getSiteUrl } from "../vulcan-lib/utils";
