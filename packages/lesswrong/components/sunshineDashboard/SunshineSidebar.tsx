@@ -17,6 +17,8 @@ import AFSuggestCommentsList from "./AFSuggestCommentsList";
 import SunshineGoogleServiceAccount from "./SunshineGoogleServiceAccount";
 import { defineStyles } from '@/components/hooks/defineStyles';
 import { useStyles } from '@/components/hooks/useStyles';
+import { useForumType } from '@/components/hooks/useForumType';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 
 const styles = defineStyles("SunshineSidebar", (theme: ThemeType) => ({
   root: {
@@ -50,7 +52,11 @@ const SunshineSidebar = () => {
   const classes = useStyles(styles);
   const [showUnderbelly, setShowUnderbelly] = useState(false)
   const currentUser = useCurrentUser();
+  const { forumType } = useForumType();
   if (!currentUser) return null
+
+  // HumanStudy doesn't use LessWrong's Curated workflow, so skip its reminder.
+  const showCurationReminder = !humanStudyForumSetting.get(forumType);
 
   const showInitialSidebar = userCanDo(currentUser, 'posts.moderate.all') || currentUser.groups?.includes('alignmentForumAdmins')
   const underbellyName = 'the Underbelly'
@@ -59,7 +65,7 @@ const SunshineSidebar = () => {
     <div className={classes.root}>
       {showInitialSidebar && <div className={classes.background}>
         <SunshineGoogleServiceAccount />
-        <SunshineCuratedSuggestionsList limit={7}/>
+        {showCurationReminder && <SunshineCuratedSuggestionsList limit={7}/>}
         <SunshineNewPostsList/>
         <SunshineNewUsersList terms={{view:"sunshineNewUsers", limit: 10}} currentUser={currentUser}/>
         <SunshineReportedContentList currentUser={currentUser}/>
@@ -71,7 +77,7 @@ const SunshineSidebar = () => {
           <AFSuggestCommentsList />
           <AFSuggestUsersList />
         </div>}
-        <SunshineCuratedSuggestionsList limit={7} atBottom/>
+        {showCurationReminder && <SunshineCuratedSuggestionsList limit={7} atBottom/>}
       </div>}
 
       { userCanDo(currentUser, 'posts.moderate.all') && <div>
