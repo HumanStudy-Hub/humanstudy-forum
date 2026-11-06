@@ -37,6 +37,8 @@ const styles = defineStyles('EditTitle', (theme: ThemeType) => ({
   }
 }));
 
+const UNTITLED_DRAFT_TITLE = "Untitled Draft";
+
 const placeholders: Record<PostCategory|"event", string> = {
   "post": "Post title",
   "event": "Event name",
@@ -54,7 +56,10 @@ export const EditTitle = ({ field, document }: EditTitleProps) => {
   const { flash } = useMessages()
   const [lastSavedTitle, setLastSavedTitle] = useState<string|undefined>(document.title ?? undefined)
 
-  const value = field.state.value ?? undefined;
+  // New posts are stored as "Untitled Draft" until the author names them; show
+  // the placeholder instead of that text so the author doesn't have to delete it.
+  const rawValue = field.state.value ?? undefined;
+  const value = rawValue === UNTITLED_DRAFT_TITLE ? "" : rawValue;
 
   const [updatePost] = useMutation(PostsMinimumInfoUpdateMutation);
 
@@ -64,6 +69,13 @@ export const EditTitle = ({ field, document }: EditTitleProps) => {
   const displayPlaceholder = placeholders[effectiveCategory];
 
   const handleChangeTitle = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    // Leaving the title empty keeps the stored placeholder title.
+    if (!event.target.value.trim()) {
+      if (rawValue !== UNTITLED_DRAFT_TITLE && lastSavedTitle === UNTITLED_DRAFT_TITLE) {
+        field.handleChange(UNTITLED_DRAFT_TITLE);
+      }
+      return;
+    }
     if (event.target.value !== lastSavedTitle && !!document._id) {
       setLastSavedTitle(event.target.value)
       void updatePost({
@@ -73,7 +85,7 @@ export const EditTitle = ({ field, document }: EditTitleProps) => {
         }
       }).then(() => flash({messageString: "Title has been changed."}));
     }
-  }, [document, updatePost, lastSavedTitle, flash])
+  }, [document, updatePost, lastSavedTitle, flash, field, rawValue])
 
   return <Input
     className={classes.root}
