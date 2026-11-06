@@ -1,6 +1,7 @@
 import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
 import { ServerError, ServerParseError } from "@apollo/client/errors";
 import { parse } from "graphql";
+import { graphqlBatchKey } from "@/lib/apollo/graphqlBatchKey";
 import { StreamingGraphqlHttpLink } from "@/lib/apollo/StreamingGraphqlHttpLink";
 
 interface OperationOutcome {
@@ -37,9 +38,9 @@ function streamingResponse(chunks: string[], options: { status?: number, errorAt
   return new Response(body, { status: options.status ?? 200 });
 }
 
-function runOperation(link: ApolloLink, query: typeof firstQuery): Promise<OperationOutcome> {
+function runOperation(link: ApolloLink, query: typeof firstQuery, context?: Record<string, unknown>): Promise<OperationOutcome> {
   return new Promise((resolve) => {
-    ApolloLink.execute(link, { query }, { client }).subscribe({
+    ApolloLink.execute(link, { query, context }, { client }).subscribe({
       next: (result) => resolve({ result }),
       error: (error) => resolve({ error }),
     });
@@ -60,6 +61,24 @@ function errorMessage(outcome: OperationOutcome) {
 }
 
 describe("StreamingGraphqlHttpLink", () => {
+  it("sends explicitly separated article and recommendation queries in separate HTTP requests", async () => {
+    const bodies: unknown[][] = [];
+    const link = new StreamingGraphqlHttpLink({
+      batchKey: (operation) => graphqlBatchKey(operation, "/api/streamGraphql"),
+      fetch: async (_url, options) => {
+        const body = JSON.parse(String(options?.body)) as unknown[];
+        bodies.push(body);
+        return streamingResponse(["[\n", ...body.map((_op, index) => resultLine(index, { ok: true })), "]\n"]);
+      },
+    });
+    const outcomes = await Promise.all([
+      runOperation(link, firstQuery, { batchKey: "singlePost" }),
+      runOperation(link, secondQuery, { batchKey: "recommendations" }),
+    ]);
+    expect(outcomes.every(outcome => !outcome.error)).toBe(true);
+    expect(bodies.map(body => body.length)).toEqual([1, 1]);
+  });
+
   it("delivers each operation's result", async () => {
     const [first, second] = await runBatch(streamingResponse([
       "[\n", resultLine(1, { second: 2 }), ",\n", resultLine(0, { first: 1 }), "]\n",
