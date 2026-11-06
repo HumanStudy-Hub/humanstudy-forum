@@ -3,10 +3,11 @@ import { type SourceLocation } from "graphql";
 import { onError } from '@apollo/client/link/error';
 import { isServer } from '../executionEnvironment';
 import { graphqlBatchMaxSetting } from '../instanceSettings';
-import { ApolloLink, Operation, selectURI } from "@apollo/client/core";
+import { ApolloLink, type Operation } from "@apollo/client/core";
 import { HttpLink } from "@apollo/client/link/http";
 import { crosspostUserAgent } from "./constants";
 import { getSiteUrl } from "../vulcan-lib/utils";
+import { graphqlBatchKey } from "./graphqlBatchKey";
 import { StreamingGraphqlHttpLink } from "./StreamingGraphqlHttpLink";
 
 /**
@@ -23,25 +24,6 @@ import { StreamingGraphqlHttpLink } from "./StreamingGraphqlHttpLink";
  */
 export const createHttpLink = (baseUrl: string, forumType: ForumTypeString) => {
   const uri = baseUrl + "api/streamGraphql";
-
-  const batchKey = (operation: Operation) => {
-    // The default part is copied from https://github.com/apollographql/apollo-client/blob/main/src/link/batch-http/batchHttpLink.ts#L192-L206
-    const context = operation.getContext();
-
-    const contextConfig = {
-      http: context.http,
-      options: context.fetchOptions,
-      credentials: context.credentials,
-    };
-
-    const defaultBatchKey = selectURI(operation, uri) + JSON.stringify(contextConfig);
-
-    // If the operation has a batchKey variable, add that to the batch key.
-    // This is to manually separate out very slow queries
-    const explicitBatchKey = context.batchKey;
-
-    return explicitBatchKey && typeof explicitBatchKey === "string" ? defaultBatchKey : defaultBatchKey + explicitBatchKey;
-  };
 
   const isSameSiteRequest = baseUrl === '/' || baseUrl === getSiteUrl(forumType);
 
@@ -63,7 +45,7 @@ export const createHttpLink = (baseUrl: string, forumType: ForumTypeString) => {
       'accept': 'application/json',
     },
     fetch,
-    batchKey,
+    batchKey: (operation) => graphqlBatchKey(operation, uri),
   });
 }
 
