@@ -168,6 +168,34 @@ function getPostCategory(query: Record<string, string>) {
     : postDefaultCategory;
 }
 
+const BLANK_DRAFT_STORAGE_PREFIX = "hs-blank-draft:";
+
+function readStoredBlankDraftId(key: string | null): string | null {
+  if (!key || typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storeBlankDraftId(key: string | null, postId: string) {
+  if (!key || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, postId);
+  } catch {
+    // Storage unavailable (private mode etc.); we just won't reuse the draft.
+  }
+}
+
+function isUntouchedBlankDraft(post: PostsEditMutationFragment, userId: string) {
+  return post.userId === userId
+    && !!post.draft
+    && !post.deletedDraft
+    && post.title === "Untitled Draft"
+    && !post.contents?.wordCount;
+}
+
 const PostsNewForm = () => {
   const pathname = usePathname();
   return <PostsNewFormInner key={pathname}/>;
@@ -243,10 +271,28 @@ const PostsNewFormInner = () => {
 
   const [createPost] = useMutation(PostsEditMutation);
 
+  // Opening a plain /newPost creates a draft immediately (the editor needs a
+  // post id). Reuse the last draft created this way if it is still untouched,
+  // so repeatedly opening the editor doesn't pile up blank "Untitled Draft"s.
+  const blankDraftStorageKey = currentUser && Object.keys(query ?? {}).length === 0
+    ? `${BLANK_DRAFT_STORAGE_PREFIX}${currentUser._id}`
+    : null;
+  const [reusableDraftId] = useState<string | null>(() => readStoredBlankDraftId(blankDraftStorageKey));
+  const { loading: reusableDraftLoading, data: reusableDraftData } = useQuery(PostsEditMutationFragmentQuery, {
+    variables: { documentId: reusableDraftId },
+    skip: !reusableDraftId,
+    fetchPolicy: "network-only",
+  });
+  const reusableDraft = reusableDraftData?.post?.result;
+
   const attemptedToCreatePostRef = useRef(false);
   useEffect(() => {
-    if (currentUser && currentUserWithModGuidelines && !templateLoading && userCanPost(currentUser) && !attemptedToCreatePostRef.current) {
+    if (currentUser && currentUserWithModGuidelines && !templateLoading && !reusableDraftLoading && userCanPost(currentUser) && !attemptedToCreatePostRef.current) {
       attemptedToCreatePostRef.current = true;
+      if (reusableDraft && isUntouchedBlankDraft(reusableDraft, currentUser._id)) {
+        navigate(postGetEditUrl(reusableDraft._id, reusableDraft.linkSharingKey ?? undefined), {replace: true});
+        return;
+      }
       void (async () => {
         const sanitizedPrefilledProps = 'contents' in prefilledProps
           ? sanitizeEditableFieldValues(prefilledProps, ['contents'])
@@ -278,6 +324,7 @@ const PostsNewFormInner = () => {
           const createdPost = data?.createPost?.data;
 
           if (createdPost) {
+            storeBlankDraftId(blankDraftStorageKey, createdPost._id);
             navigate(postGetEditUrl(createdPost._id, createdPost.linkSharingKey ?? undefined), {replace: true});
           }
         } catch(e) {
@@ -287,7 +334,7 @@ const PostsNewFormInner = () => {
     }
   // Disable warning because lint doesn't know depending on JSON.stringify(prefilledProps) is the same as depending on prefilledProps
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, currentUserWithModGuidelines, templateLoading, createPost, navigate, JSON.stringify(prefilledProps)]);
+  }, [currentUser, currentUserWithModGuidelines, templateLoading, reusableDraftLoading, reusableDraft, createPost, navigate, JSON.stringify(prefilledProps)]);
 
   if (!currentUser) {
     return (<LoginForm />);
