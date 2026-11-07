@@ -209,7 +209,7 @@ class CommentsRepo extends AbstractRepo<"Comments"> {
     });
   }
 
-  private getSearchDocumentQuery(): string {
+  getSearchDocumentQuery(): string {
     return `
       -- CommentsRepo.getSearchDocumentQuery
       SELECT

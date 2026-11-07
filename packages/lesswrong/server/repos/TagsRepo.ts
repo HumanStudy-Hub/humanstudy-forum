@@ -9,7 +9,7 @@ class TagsRepo extends AbstractRepo<"Tags"> {
     super(Tags);
   }
 
-  private getSearchDocumentQuery(): string {
+  getSearchDocumentQuery(): string {
     return `
       -- TagsRepo.getSearchDocumentQuery
       SELECT

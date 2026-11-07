@@ -229,7 +229,7 @@ class UsersRepo extends AbstractRepo<"Users"> {
     `, [userId, reduceAFKarma]);
   }
 
-  private getSearchDocumentQuery(): string {
+  getSearchDocumentQuery(): string {
     return `
       SELECT
         u."_id",
