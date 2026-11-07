@@ -2,8 +2,7 @@ import type { ForumTypeString } from '@/lib/instanceSettings';
 import groupBy from "lodash/groupBy"
 import uniq from "lodash/uniq"
 import moment from "moment"
-import { forumSelect } from "../forumTypeUtils"
-import { autoCommentRateLimits, autoPostRateLimits } from "./constants"
+import { getAutoCommentRateLimits, getAutoPostRateLimits } from "./constants"
 import { AutoRateLimit, RateLimitComparison, RateLimitFeatures, RateLimitInfo, RateLimitUser, RecentKarmaInfo, RecentVoteInfo, TimeframeUnitType, UserKarmaInfo, UserKarmaInfoWindow } from "./types"
 
 export function getModRateLimitInfo(documents: Array<DbPost|DbComment>, modRateLimitHours: number, itemsPerTimeframe: number): RateLimitInfo|null {
@@ -209,8 +208,8 @@ export function getCurrentAndPreviousUserKarmaInfo(user: DbUser, currentVotes: R
 export function getRateLimitStrictnessComparisons(userKarmaInfoWindow: UserKarmaInfoWindow, forumType: ForumTypeString) {
   const { currentUserKarmaInfo, previousUserKarmaInfo } = userKarmaInfoWindow;
 
-  const commentRateLimits = forumSelect(autoCommentRateLimits, forumType);
-  const postRateLimits = forumSelect(autoPostRateLimits, forumType);
+  const commentRateLimits = getAutoCommentRateLimits(forumType);
+  const postRateLimits = getAutoPostRateLimits(forumType);
 
   const activeCommentRateLimits = getActiveRateLimits(currentUserKarmaInfo, commentRateLimits);
   const previousCommentRateLimits = getActiveRateLimits(previousUserKarmaInfo, commentRateLimits);

@@ -1,7 +1,6 @@
 import { useForumType } from '@/components/hooks/useForumType';
 import React from 'react';
-import { forumSelect } from '../../../lib/forumTypeUtils';
-import { autoCommentRateLimits, autoPostRateLimits } from '../../../lib/rateLimits/constants';
+import { getAutoCommentRateLimits, getAutoPostRateLimits } from '../../../lib/rateLimits/constants';
 import { getDownvoteRatio, getStrictestActiveRateLimitNames as getStrictestActiveRateLimits } from '../../../lib/rateLimits/utils';
 import StarIcon from '@/lib/vendor/@material-ui/icons/src/Star';
 import StarBorderIcon from '@/lib/vendor/@material-ui/icons/src/StarBorder';
@@ -117,7 +116,7 @@ export const UserAutoRateLimitsDisplay = ({user, showKarmaMeta = false, absolute
   const { forumType } = useForumType();
   const classes = useStyles(styles);
   const roundedDownvoteRatio = Math.round(getDownvoteRatio(user) * 100)
-  const allRateLimits = [...forumSelect(autoPostRateLimits, forumType), ...forumSelect(autoCommentRateLimits, forumType)]
+  const allRateLimits = [...getAutoPostRateLimits(forumType), ...getAutoCommentRateLimits(forumType)]
   const strictestRateLimits = getStrictestActiveRateLimits(user, allRateLimits);
 
   const totalReceivedVotes = (

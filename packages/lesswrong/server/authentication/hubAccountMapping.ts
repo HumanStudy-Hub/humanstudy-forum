@@ -20,8 +20,10 @@ export function getOrCreateHubForumUserId(db: Pick<SqlClient, 'tx'>, identity: H
     // Profile URLs are looked up by slugify(slug), which lowercases; a mixed-case
     // slug would make the profile page 404.
     const username = `researcher-${id.toLowerCase()}`;
-    await transaction.none(`INSERT INTO "Users" (_id, slug, username, "displayName", email, emails, services, "isAdmin", "abTestKey")
-      VALUES ($1, $2, $2, $3, $4, ARRAY[jsonb_build_object('address', $4::text, 'verified', true)], '{}'::jsonb, false, $1)`, [id, username, identity.displayName, identity.email]);
+    // Hub members are trusted: mark them reviewed so their posts and comments
+    // are public immediately instead of waiting in the moderation queue.
+    await transaction.none(`INSERT INTO "Users" (_id, slug, username, "displayName", email, emails, services, "isAdmin", "abTestKey", "reviewedByUserId", "reviewedAt")
+      VALUES ($1, $2, $2, $3, $4, ARRAY[jsonb_build_object('address', $4::text, 'verified', true)], '{}'::jsonb, false, $1, $1, now())`, [id, username, identity.displayName, identity.email]);
     await transaction.none('INSERT INTO "HumanStudyAccounts" (auth_user_id, forum_user_id) VALUES ($1, $2)', [identity.id, id]);
     return id;
   });
