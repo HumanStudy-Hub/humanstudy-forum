@@ -20,17 +20,18 @@ export async function GET(request: NextRequest) {
 
   const isTestServer = testServerSetting.get(context);
 
-  // Run all once-a-minute tasks
-  const tasks: Promise<void>[] = [];
+  // Run these one at a time: each lock holds a pooled connection for the
+  // whole job, and with a small pool (PG_MAX_CONNECTIONS=2) running them in
+  // parallel leaves the jobs themselves no connection to query with.
 
   // Send curation emails
   if (!isTestServer && usesCurationEmailsCron(context.forumType)) {
-    tasks.push(getLockOrAbort('sendCurationEmails', sendCurationEmails));
+    await getLockOrAbort('sendCurationEmails', sendCurationEmails);
   }
 
   // Debounced event handler
   if (!isTestServer) {
-    tasks.push(getLockOrAbort('dispatchPendingEvents', dispatchPendingEvents));
+    await getLockOrAbort('dispatchPendingEvents', dispatchPendingEvents);
   }
 
   // Check upcoming event emails
@@ -41,8 +42,5 @@ export async function GET(request: NextRequest) {
   // Update score active documents (runs regardless of test server setting)
   await getLockOrAbort('updateScoreActiveDocuments', updateScoreActiveDocuments);
 
-  // Execute all tasks in parallel
-  await Promise.all(tasks);
-  
   return new Response('OK', { status: 200 });
 }

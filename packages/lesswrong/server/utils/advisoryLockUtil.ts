@@ -19,18 +19,18 @@ export function getLockOrAbort(lockName: string, callback: (task: ITask<any>) =>
   const db = getSqlClientOrThrow();
   const lockId = Math.floor(cyrb53Rand(lockName) * 1e15);
 
-  return db.task(async (task) => {
-    try {
-      const lockResult = await task.any<{ pg_try_advisory_lock: boolean }>(`SELECT pg_try_advisory_lock($1)`, [lockId]);
-      if (!lockResult[0].pg_try_advisory_lock) {
-        // eslint-disable-next-line no-console
-        console.error(`Lock could not be acquired for job ${lockName}`);
-        captureException(new Error(`Lock could not be acquired for job ${lockName}`));
-        return;
-      }
-      return await callback(task);
-    } finally {
-      await task.any(`SELECT pg_advisory_unlock($1)`, [lockId]);
+  // Use a transaction-scoped lock. Session-scoped locks leak behind a
+  // transaction-mode pooler (Supabase Supavisor): the lock stays on whichever
+  // server connection took it, and the unlock can run on a different one.
+  // A transaction lock is released automatically on commit or rollback.
+  return db.tx(async (task) => {
+    const lockResult = await task.any<{ locked: boolean }>(`SELECT pg_try_advisory_xact_lock($1) AS locked`, [lockId]);
+    if (!lockResult[0].locked) {
+      // eslint-disable-next-line no-console
+      console.error(`Lock could not be acquired for job ${lockName}`);
+      captureException(new Error(`Lock could not be acquired for job ${lockName}`));
+      return;
     }
+    return await callback(task);
   });
 }
