@@ -10,7 +10,7 @@ class SequencesRepo extends AbstractRepo<"Sequences"> {
     super(Sequences);
   }
 
-  private getSearchDocumentQuery(): string {
+  getSearchDocumentQuery(): string {
     return `
       -- SequencesRepo.getSearchDocumentQuery
       SELECT

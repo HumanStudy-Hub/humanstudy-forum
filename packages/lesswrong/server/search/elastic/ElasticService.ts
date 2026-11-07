@@ -1,4 +1,7 @@
-import ElasticClient, { ElasticSearchHit } from "./ElasticClient";
+import ElasticClient, { ElasticSearchHit, HitsOnlySearchResponse } from "./ElasticClient";
+import PostgresSearchClient from "../PostgresSearchClient";
+import type { QueryData } from "./ElasticQuery";
+import type { MultiQueryData } from "./ElasticMultiQuery";
 import type { SearchResult } from "./SearchResult";
 import { algoliaIndexPrefix } from '@/lib/instanceSettings';
 import { indexNameToConfig } from "./ElasticConfig";
@@ -31,9 +34,27 @@ const extractNamedHighlight = (
   };
 }
 
+type SearchBackend = {
+  search(queryData: QueryData): Promise<HitsOnlySearchResponse>,
+  multiSearch(queryData: MultiQueryData): Promise<HitsOnlySearchResponse>,
+};
+
+const hasElasticCredentials = () => !!(
+  process.env.private_elasticsearch_cloudId &&
+  process.env.private_elasticsearch_username &&
+  process.env.private_elasticsearch_password
+);
+
+/**
+ * Use Elasticsearch when it's configured; otherwise search Postgres directly
+ * (the HumanStudy forum runs without an Elastic cluster).
+ */
+const createSearchBackend = (): SearchBackend =>
+  hasElasticCredentials() ? new ElasticClient() : new PostgresSearchClient();
+
 class ElasticService {
   constructor(
-    private client = new ElasticClient(),
+    private client: SearchBackend = createSearchBackend(),
   ) {}
 
   async runQuery({indexName, params}: SearchQuery, options: SearchOptions): Promise<SearchResult> {

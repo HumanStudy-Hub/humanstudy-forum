@@ -471,7 +471,7 @@ class PostsRepo extends AbstractRepo<"Posts"> {
     `, [String(days), limit, currentUser?._id]);
   }
 
-  private getSearchDocumentQuery(): string {
+  getSearchDocumentQuery(): string {
     return `
       -- PostsRepo.getSearchDocumentQuery
       SELECT
