@@ -1,5 +1,5 @@
 import { captureException } from '@/lib/sentryWrapper';
-import type { ForumTypeString } from '@/lib/instanceSettings';
+import { humanStudyForumSetting, type ForumTypeString } from '@/lib/instanceSettings';
 import { createAnonymousContext } from '@/server/vulcan-lib/createContexts';
 import { createAutomatedContentEvaluation } from './helpers';
 
@@ -11,6 +11,8 @@ const MAX_RETRIES_PER_RUN = 20;
 export async function retryMissingPangramEvaluations(forumType: ForumTypeString): Promise<void> {
   // Matches the publish-time check.
   if (forumType !== 'LessWrong') return;
+  // HumanStudy doesn't run automated AI-content review.
+  if (humanStudyForumSetting.get(forumType)) return;
 
   const context = createAnonymousContext({ forumType });
   const now = Date.now();

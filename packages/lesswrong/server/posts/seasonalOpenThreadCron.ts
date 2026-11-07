@@ -1,5 +1,5 @@
 import type { ForumTypeString } from "@/lib/instanceSettings";
-import { openThreadTagIdSetting, seasonalOpenThreadAuthorSlugSetting } from "@/lib/instanceSettings";
+import { humanStudyForumSetting, openThreadTagIdSetting, seasonalOpenThreadAuthorSlugSetting } from "@/lib/instanceSettings";
 import { postStatuses } from "@/lib/collections/posts/constants";
 import Posts from "@/server/collections/posts/collection";
 import Users from "@/server/collections/users/collection";
@@ -101,7 +101,8 @@ export const maybeCreateSeasonalOpenThread = async (date = new Date(), forumType
   if (!info) {
     return { status: "not_due" };
   }
-  if (forumType !== 'LessWrong') {
+  // HumanStudy runs as forumType LessWrong but doesn't want LW's open threads.
+  if (forumType !== 'LessWrong' || humanStudyForumSetting.get(forumType)) {
     return { status: "not_lesswrong", title: info.title };
   }
 

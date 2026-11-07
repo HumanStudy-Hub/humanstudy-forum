@@ -40,6 +40,8 @@ creating another paid compute instance. Do not delete it during this rollout.
 | `HUB_AUTH_ORIGIN` | `https://humanstudy-hub.com` |
 | `SUPABASE_URL` | Existing Hub project URL |
 | `SUPABASE_PUBLISHABLE_KEY` | Existing Hub publishable key, never service-role key |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | HumanStudy Cloudinary cloud name (public; inlined at build) |
+| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Unsigned upload preset used for all image uploads (public) |
 | `NODE_OPTIONS` | `--max-old-space-size=8192` |
 
 Do not include `sslmode` in `PG_URL`; node-postgres otherwise replaces explicit TLS settings.
