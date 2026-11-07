@@ -42,6 +42,8 @@ creating another paid compute instance. Do not delete it during this rollout.
 | `SUPABASE_PUBLISHABLE_KEY` | Existing Hub publishable key, never service-role key |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | HumanStudy Cloudinary cloud name (public; inlined at build) |
 | `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Unsigned upload preset used for all image uploads (public) |
+| `NEXT_PUBLIC_SENTRY_DSN` | HumanStudy Sentry project DSN (public; inlined at build). Unset = Sentry off |
+| `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Optional: source-map upload at build time. Token is secret |
 | `NODE_OPTIONS` | `--max-old-space-size=6144` (8192 makes the 8 GB build container OOM-kill `next build`) |
 
 Do not include `sslmode` in `PG_URL`; node-postgres otherwise replaces explicit TLS settings.
