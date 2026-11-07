@@ -1,4 +1,5 @@
-import type { ForumOptions } from "../forumTypeUtils";
+import { forumSelect, type ForumOptions } from "../forumTypeUtils";
+import { humanStudyForumSetting, type ForumTypeString } from "../instanceSettings";
 import type { AutoRateLimit, CommentAutoRateLimit, PostAutoRateLimit, TimeframeUnitType } from "./types";
 
 /**
@@ -238,3 +239,17 @@ export const autoCommentRateLimits: ForumOptions<CommentAutoRateLimit[]> = {
     ALL.COMMENTS.ONE_PER_EIGHT_SECONDS
   ]
 };
+
+// HumanStudy lets every Hub member post right away, so it skips LessWrong's
+// karma-based new-user limits and keeps only the universal anti-spam ones.
+export function getAutoPostRateLimits(forum: ForumTypeString | ResolverContext): PostAutoRateLimit[] {
+  return humanStudyForumSetting.get(forum)
+    ? [ALL.POSTS.FIVE_PER_DAY]
+    : forumSelect(autoPostRateLimits, forum);
+}
+
+export function getAutoCommentRateLimits(forum: ForumTypeString | ResolverContext): CommentAutoRateLimit[] {
+  return humanStudyForumSetting.get(forum)
+    ? [ALL.COMMENTS.ONE_PER_EIGHT_SECONDS]
+    : forumSelect(autoCommentRateLimits, forum);
+}

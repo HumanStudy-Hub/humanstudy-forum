@@ -3,9 +3,8 @@ import { getActiveUserRateLimitSelector } from '@/lib/collections/userRateLimits
 import moment from "moment"
 import { getAverageContentKarma, getTimeframeForRateLimit } from "../lib/collections/moderatorActions/helpers"
 import { EXEMPT_FROM_RATE_LIMITS, MODERATOR_ACTION_TYPES, PostAndCommentRateLimitTypes, RATE_LIMIT_THREE_COMMENTS_PER_POST_PER_WEEK, STRICTER_COMMENT_AUTOMOD_RATE_LIMIT, STRICTER_POST_AUTOMOD_RATE_LIMIT, postAndCommentRateLimits } from "@/lib/collections/moderatorActions/constants"
-import { forumSelect } from "../lib/forumTypeUtils"
 import { userIsAdmin, userIsMemberOf } from "../lib/vulcan-users/permissions"
-import { autoCommentRateLimits, autoPostRateLimits } from "../lib/rateLimits/constants"
+import { getAutoCommentRateLimits, getAutoPostRateLimits } from "../lib/rateLimits/constants"
 import type { AutoRateLimit, CommentAutoRateLimit, PostAutoRateLimit, RateLimitComparison, RateLimitFeatures, RateLimitInfo, RecentKarmaInfo, RecentVoteInfo, UserKarmaInfoWindow } from "../lib/rateLimits/types"
 import { calculateRecentKarmaInfo, documentOnlyHasSelfVote, getActiveRateLimits, getAutoRateLimitInfo, getCurrentAndPreviousUserKarmaInfo, getMaxAutoLimitHours, getModRateLimitInfo, getRateLimitStrictnessComparisons, getStrictestRateLimitInfo, getManualRateLimitInfo, getManualRateLimitIntervalHours, getDownvoteRatio } from "../lib/rateLimits/utils"
 import { appendToSunshineNotes } from "./users/sunshineNotes"
@@ -130,7 +129,7 @@ function getPostRateLimitInfos(
     downvoteRatio: getDownvoteRatio(user)
   } 
 
-  const autoRatelimits = forumSelect(autoPostRateLimits, forumType)
+  const autoRatelimits = getAutoPostRateLimits(forumType)
   const autoRateLimitInfos = autoRatelimits?.map(
     rateLimit => getAutoRateLimitInfo(user, features, rateLimit, postsInTimeframe)
   ) ?? []
@@ -246,7 +245,7 @@ async function getCommentRateLimitInfos({commentsInTimeframe, user, modRateLimit
     ? []
     : manualCommentRateLimits.map(rateLimit => getManualRateLimitInfo(rateLimit, commentsOnOthersPostsInTimeframe))
 
-  const autoRateLimits = forumSelect(autoCommentRateLimits, context)
+  const autoRateLimits = getAutoCommentRateLimits(context)
   const filteredAutoRateLimits = autoRateLimits?.filter(rateLimit => {
     if (userIsAuthor) return rateLimit.appliesToOwnPosts
     return true 
@@ -286,7 +285,7 @@ export async function rateLimitDateWhenUserNextAbleToPost(user: DbUser, context:
 
   // what's the longest rate limit timeframe being evaluated?
   const manualPostRateLimitHours = getMaxManualRateLimitHours(manualPostRateLimits);
-  const maxPostAutolimitHours = getMaxAutoLimitHours(forumSelect(autoPostRateLimits, context));
+  const maxPostAutolimitHours = getMaxAutoLimitHours(getAutoPostRateLimits(context));
   const maxHours = Math.max(modRateLimitHours, manualPostRateLimitHours, maxPostAutolimitHours);
 
   // fetch the posts from within the maxTimeframe
@@ -313,7 +312,7 @@ export async function rateLimitDateWhenUserNextAbleToComment(user: DbUser, postI
   const manualCommentRateLimitHours = getMaxManualRateLimitHours(manualCommentRateLimits);
 
   // what's the longest rate limit timeframe being evaluated?
-  const maxCommentAutolimitHours = getMaxAutoLimitHours(forumSelect(autoCommentRateLimits, context))
+  const maxCommentAutolimitHours = getMaxAutoLimitHours(getAutoCommentRateLimits(context))
   const maxHours = Math.max(modRateLimitHours, modPostSpecificRateLimitHours, maxCommentAutolimitHours, manualCommentRateLimitHours);
 
   // fetch the comments from within the maxTimeframe
@@ -491,8 +490,8 @@ export async function checkForStricterRateLimits(userId: string, documentId: str
 async function checkForLoosenedRateLimits(userId: string, userKarmaInfoWindow: UserKarmaInfoWindow, documentId: string, collectionName: CollectionNameString, triggeredAt: Date, context: ResolverContext) {
   const { currentUserKarmaInfo, previousUserKarmaInfo } = userKarmaInfoWindow;
 
-  const commentRateLimits = forumSelect(autoCommentRateLimits, context);
-  const postRateLimits = forumSelect(autoPostRateLimits, context);
+  const commentRateLimits = getAutoCommentRateLimits(context);
+  const postRateLimits = getAutoPostRateLimits(context);
 
   if (!commentRateLimits || !postRateLimits) return;
 

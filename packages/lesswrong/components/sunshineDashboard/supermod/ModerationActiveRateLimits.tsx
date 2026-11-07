@@ -7,8 +7,7 @@ import { defineStyles, useStyles } from '@/components/hooks/useStyles';
 import { useForumType } from '@/components/hooks/useForumType';
 import type { ForumTypeString } from '@/lib/instanceSettings';
 import LWTooltip from '@/components/common/LWTooltip';
-import { forumSelect } from '@/lib/forumTypeUtils';
-import { autoCommentRateLimits, autoPostRateLimits } from '@/lib/rateLimits/constants';
+import { getAutoCommentRateLimits, getAutoPostRateLimits } from '@/lib/rateLimits/constants';
 import { getStrictestActiveRateLimitNames } from '@/lib/rateLimits/utils';
 import { allRateLimits, MODERATOR_ACTION_TYPES, type AllRateLimitTypes } from '@/lib/collections/moderatorActions/constants';
 import { getKarmaLiftDescription, getRateLimitDescription } from '../UserRateLimitItem';
@@ -65,7 +64,7 @@ function getEndDescription(endedAt: string | null) {
 }
 
 function getActiveRateLimitRows(user: SunshineUsersList, forumType: ForumTypeString): ActiveRateLimitRow[] {
-  const autoRateLimits = [...forumSelect(autoPostRateLimits, forumType), ...forumSelect(autoCommentRateLimits, forumType)];
+  const autoRateLimits = [...getAutoPostRateLimits(forumType), ...getAutoCommentRateLimits(forumType)];
   const autoRows = getStrictestActiveRateLimitNames(user, autoRateLimits).map(({ name, isActive, rateLimitType }): ActiveRateLimitRow => {
     const isNewUserDefault = rateLimitType === 'newUserDefault';
     return {
