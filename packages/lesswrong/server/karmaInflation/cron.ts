@@ -16,6 +16,13 @@ export async function refreshKarmaInflation() {
   const meanKarmaByInterval = await postsRepo.getMeanKarmaByInterval(startDate, AVERAGING_WINDOW_MS);
   const meanKarmaOverall = await postsRepo.getMeanKarmaOverall();
 
+  // A new forum may have no posts that qualify yet; keep the current series.
+  if (!startDate || meanKarmaByInterval.length === 0) {
+    // eslint-disable-next-line no-console
+    console.log("Not enough posts to compute karma inflation yet");
+    return;
+  }
+
   const reciprocalOrOne = (x: number) => x === 0 ? 1 : 1 / x;
 
   // _id in meanKarmaByInterval always corresponds to the index of that interval in

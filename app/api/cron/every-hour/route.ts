@@ -1,5 +1,6 @@
 import { getForumTypeForRequest } from "@/server/utils/requestUtil";
-import type { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server'
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 import { checkCronRequestAuthorization } from '@/server/utils/cronAuth';
 import { clearArbitalCache } from '@/server/resolvers/arbitalPageData';
 import { permanentlyDeleteUsers } from '@/server/users/permanentDeletion';
@@ -27,9 +28,13 @@ export async function GET(request: NextRequest) {
 
   // These are heavier and we don't want to stress the db too much, so run these sequentially
 
-  // Update unique post upvoters view
-  const db = getSqlClientOrThrow();
-  await uniquePostUpvotersView.refresh(db);
+  // Update unique post upvoters view. It only feeds LessWrong's collaborative
+  // filtering recommendations, and the HumanStudy runtime role doesn't own the
+  // view (it can't REFRESH it), so skip it there.
+  if (!humanStudyForumSetting.get(getForumTypeForRequest(request))) {
+    const db = getSqlClientOrThrow();
+    await uniquePostUpvotersView.refresh(db);
+  }
 
   // Clear ultrafeed served events older than 48 hours
   await clearOldUltraFeedServedEvents();
