@@ -9,7 +9,9 @@ const { getSentry } = require('@/lib/sentryWrapper');
 const Sentry = getSentry();
 
 Sentry?.init({
-  dsn: "https://1ab1949fc8d04608b43132f37bb2a1b0@o195791.ingest.us.sentry.io/1301611",
+  // HumanStudy: the DSN comes from the environment. Without it, Sentry stays off
+  // (the upstream file hard-coded LessWrong's own Sentry project).
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || undefined,
   environment: process.env.NODE_ENV ?? "development",
 
   integrations: [
@@ -30,5 +32,5 @@ Sentry?.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  enabled: true,
+  enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
