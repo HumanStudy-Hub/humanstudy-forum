@@ -1,13 +1,13 @@
 import { useForumType } from '@/components/hooks/useForumType';
 import React, { useEffect, useState, useMemo, useCallback, Suspense } from 'react';
 import { registerComponent } from '../../../lib/vulcan-lib/components';
-import { getResponseCounts, isDialogueParticipant } from '../../../lib/collections/posts/helpers';
+import { getManualSocialPreviewImageId, getResponseCounts, isDialogueParticipant } from '../../../lib/collections/posts/helpers';
 import { commentGetDefaultView, commentIncludedInCounts } from '../../../lib/collections/comments/helpers'
 import { useCurrentUser } from '../../common/withUser';
 import withErrorBoundary from '../../common/withErrorBoundary'
 import { useRecordPostView } from '../../hooks/useRecordPostView';
 import { AnalyticsContext, useTracking } from "../../../lib/analyticsEvents";
-import { isEAForum, maxDocumentsPerRequestSetting, recombeeEnabledSetting } from '@/lib/instanceSettings';
+import { humanStudyForumSetting, isEAForum, maxDocumentsPerRequestSetting, recombeeEnabledSetting } from '@/lib/instanceSettings';
 import classNames from 'classnames';
 import { useDialog } from '../../common/withDialog';
 import { PostsPageContext } from './PostsPageContext';
@@ -271,6 +271,9 @@ const PostsPage = ({fullPost, postPreload, sequenceIdFromUrl, refetch, embedded,
   const { isAF, forumType } = useForumType();
   const classes = useStyles(styles);
   const post = fullPost ?? postPreload;
+  const humanStudyCoverImageId = humanStudyForumSetting.get(forumType)
+    ? getManualSocialPreviewImageId(post.socialPreviewData?.imageUrl, forumType)
+    : null;
   const location = useSubscribedLocation();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
@@ -562,6 +565,14 @@ const PostsPage = ({fullPost, postPreload, sequenceIdFromUrl, refetch, embedded,
           {post.eventImageId && <div className={classNames(classes.headerImageContainer, {[classes.headerImageContainerWithComment]: permalinkedCommentId})}>
             <CloudinaryImage2
               publicId={post.eventImageId}
+              imgProps={{ar: '191:100', w: '682', q: '100'}}
+              className={classes.headerImage}
+            />
+          </div>}
+          {/* HumanStudy: show the author's own cover image above the title. */}
+          {!post.eventImageId && humanStudyCoverImageId && <div className={classNames(classes.headerImageContainer, {[classes.headerImageContainerWithComment]: permalinkedCommentId})}>
+            <CloudinaryImage2
+              publicId={humanStudyCoverImageId}
               imgProps={{ar: '191:100', w: '682', q: '100'}}
               className={classes.headerImage}
             />

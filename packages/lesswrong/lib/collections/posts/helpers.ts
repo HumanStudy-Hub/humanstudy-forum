@@ -168,6 +168,13 @@ ${postGetAbsoluteLink(post, forumType)}
 const getSocialImagePreviewPrefix = (forumType: ForumTypeString) =>
   `https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/c_fill,ar_1.91,g_auto/`;
 
+// The Cloudinary image id of a cover the author uploaded themselves, or null
+// when the preview URL is absent or was picked automatically from the body.
+export const getManualSocialPreviewImageId = (imageUrl: string | null | undefined, forumType: ForumTypeString): string | null => {
+  const prefix = getSocialImagePreviewPrefix(forumType);
+  return imageUrl?.startsWith(prefix) ? imageUrl.slice(prefix.length) || null : null;
+}
+
 // Select the social preview image for the post.
 // For events, we use their event image if that is set.
 // For other posts, we use the manually-set cloudinary image if available,
