@@ -859,8 +859,36 @@ const PostForm = ({
                   );
                 }
 
+                const isQuestion = postCategory === "question";
+                const questionToggle = (
+                  <LWTooltip title={isQuestion ? "Make this a regular post" : "Ask the community a question: answers get their own section and the post shows under Questions"}>
+                    <button
+                      type="button"
+                      className={classNames(
+                        classes.linkpostToggle,
+                        isQuestion && classes.linkpostToggleActive,
+                      )}
+                      aria-label={isQuestion ? "Make this a regular post" : "Make this a question"}
+                      onClick={() => {
+                        form.setFieldValue("postCategory", isQuestion ? "post" : "question");
+                        form.setFieldValue("question", !isQuestion);
+                        if (!isQuestion) {
+                          form.setFieldValue("url", "");
+                          setEditingLinkpostUrl(false);
+                        }
+                      }}
+                    >
+                      {isQuestion ? "Question" : "+ Question"}
+                    </button>
+                  </LWTooltip>
+                );
+                if (isQuestion) {
+                  return questionToggle;
+                }
+
                 // Show toggle button (no URL set, not editing)
-                return (
+                return (<>
+                  {questionToggle}
                   <LWTooltip title={isLinkpost ? "Remove linkpost" : "Make this a linkpost"}>
                     <button
                       type="button"
@@ -884,7 +912,7 @@ const PostForm = ({
                       {isLinkpost ? "Linkpost" : "+ Linkpost"}
                     </button>
                   </LWTooltip>
-                );
+                </>);
               }}
             </form.Subscribe>}
             {!isConnected && (

@@ -771,9 +771,10 @@ const schema = {
       outputType: "Boolean!",
       inputType: "Boolean",
       canRead: ["guests"],
-      // Users can no longer create question posts or convert posts into questions
-      canUpdate: ["sunshineRegiment", "admins"],
-      canCreate: ["sunshineRegiment", "admins"],
+      // LessWrong stopped letting users create questions; HumanStudy re-enables it
+      // so authors can mark their own posts as questions from the editor.
+      canUpdate: [userOwns, "sunshineRegiment", "admins"],
+      canCreate: ["members"],
       validation: {
         optional: true,
       },
