@@ -1087,12 +1087,11 @@ function sunshineNewPosts() {
 
 function sunshineAutoClassifiedPosts(_terms: PostsViewTerms, _client: ApolloClient, context: ResolverContext) {
   const adminTeamAccountId = adminAccountSetting.get(context)?._id;
-  if (!adminTeamAccountId) {
-    throw new Error('Admin team account ID is not set');
-  }
+  // Without an admin team account (e.g. HumanStudy) nothing is auto-classified,
+  // so return an empty list instead of breaking the moderation inbox.
   return {
     selector: {
-      reviewedByUserId: adminTeamAccountId,
+      reviewedByUserId: adminTeamAccountId ?? "no-admin-team-account",
     },
     options: {
       sort: {
