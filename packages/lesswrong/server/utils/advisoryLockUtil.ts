@@ -1,4 +1,3 @@
-import { captureException } from "@/lib/sentryWrapper";
 import { getSqlClientOrThrow } from "../sql/sqlClient";
 import { cyrb53Rand } from '@/server/perfMetrics';
 import type { ITask } from "pg-promise";
@@ -26,9 +25,11 @@ export function getLockOrAbort(lockName: string, callback: (task: ITask<any>) =>
   return db.tx(async (task) => {
     const lockResult = await task.any<{ locked: boolean }>(`SELECT pg_try_advisory_xact_lock($1) AS locked`, [lockId]);
     if (!lockResult[0].locked) {
+      // Another run of this job still holds the lock (e.g. a slow cold start
+      // overlapping the next cron tick). Skipping this tick is the intended
+      // behaviour, so log it without reporting an error.
       // eslint-disable-next-line no-console
-      console.error(`Lock could not be acquired for job ${lockName}`);
-      captureException(new Error(`Lock could not be acquired for job ${lockName}`));
+      console.warn(`Lock could not be acquired for job ${lockName}; skipping this run`);
       return;
     }
     return await callback(task);
