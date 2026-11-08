@@ -5,6 +5,7 @@ import { Link } from '../../lib/reactRouterWrapper';
 import Headroom from '../../lib/react-headroom'
 import IconButton from '@/lib/vendor/@material-ui/core/src/IconButton';
 import TocIcon from '@/lib/vendor/@material-ui/icons/src/Toc';
+import HomeIcon from '@/lib/vendor/@material-ui/icons/src/Home';
 import { useCurrentUserId, useGetCurrentUser } from '../common/withUser';
 import { SidebarsContext } from './SidebarsWrapper';
 import withErrorBoundary from '../common/withErrorBoundary';
@@ -207,6 +208,15 @@ export const styles = defineStyles("Header", (theme: ThemeType) => ({
     color: theme.palette.primary.main,
     '& span': { fontStyle: 'italic' },
     [theme.breakpoints.down('xs')]: { fontSize: 20 },
+  },
+  visuallyHidden: { position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' },
+  // HumanStudy uses a plain home icon instead of a site-name wordmark.
+  humanStudyHomeIcon: {
+    fontSize: 26,
+    verticalAlign: 'middle',
+    color: theme.palette.primary.main,
+    position: 'relative',
+    top: -2,
   },
   // Keep the whole wordmark visible on phones instead of clipping it.
   humanStudyTitle: { minWidth: 'max-content' },
@@ -591,13 +601,13 @@ const Header = ({
 
               <Typography className={classNames(classes.title, classes.hideXsDown)} variant="title">
                 <Link to="/" className={classes.titleLink}>
-                  {humanStudyForumSetting.get(forumType) ? <span className={classes.humanStudyWordmark}>Human<span>Study</span></span> : forumHeaderTitleSetting.get(forumType)}
+                  {humanStudyForumSetting.get(forumType) ? <><HomeIcon className={classes.humanStudyHomeIcon} /><span className={classes.visuallyHidden}>HumanStudy Forum home</span></> : forumHeaderTitleSetting.get(forumType)}
                 </Link>
                 <HeaderSubtitle />
               </Typography>
               <Typography className={classNames(classes.title, classes.hideSmUp, humanStudyForumSetting.get(forumType) && classes.humanStudyTitle)} variant="title">
                 <Link to="/" className={classes.titleLink}>
-                  {humanStudyForumSetting.get(forumType) ? <span className={classes.humanStudyWordmark}>Human<span>Study</span></span> : forumShortTitleSetting.get(forumType)}
+                  {humanStudyForumSetting.get(forumType) ? <><HomeIcon className={classes.humanStudyHomeIcon} /><span className={classes.visuallyHidden}>HumanStudy Forum home</span></> : forumShortTitleSetting.get(forumType)}
                 </Link>
               </Typography>
               {rightHeaderItemsNode}
