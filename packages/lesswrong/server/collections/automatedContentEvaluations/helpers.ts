@@ -352,6 +352,10 @@ export async function createAutomatedContentEvaluation(
   const documentId = revision.documentId;
   if (!documentId) return;
 
+  // AI-text detection is an optional paid service (HumanStudy doesn't use it).
+  // Without a key, skip quietly instead of reporting an error on every publish.
+  if (!process.env.PANGRAM_API_KEY) return;
+
   const pangramEvaluation = await getPangramEvaluation(revision).catch((err) => {
     // eslint-disable-next-line no-console
     console.error("Pangram evaluation failed: ", err);
