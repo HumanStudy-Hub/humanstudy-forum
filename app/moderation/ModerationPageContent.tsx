@@ -17,6 +17,8 @@ import Loading from '@/components/vulcan-core/Loading';
 import { useQuery } from '@/lib/crud/useQuery';
 import { gql } from '@/lib/generated/gql-codegen';
 import classNames from 'classnames';
+import { useForumType } from "@/components/hooks/useForumType";
+import { humanStudyForumSetting } from "@/lib/instanceSettings";
 
 const ModeratorCommentsMultiQuery = gql(`
   query multiModeratorCommentsQuery($commentIds: [String!]!) {
@@ -721,6 +723,8 @@ export default function ModerationPageContent(props: Props) {
   } = props;
 
   const classes = useStyles(styles);
+  const { forumType } = useForumType();
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
   const searchParams = useSearchParams();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -862,13 +866,27 @@ export default function ModerationPageContent(props: Props) {
         <div>
           <div className={classes.essay}>
             <h2 className={classes.essayTitle}>Moderation Principles and Process</h2>
-            <p>LessWrong is trying to cultivate a specific culture. The best pointers towards that culture are the <Link to="/rationality">LessWrong Sequences</Link> and the <Link to="/posts/LbbrnRvc9QwjJeics/new-user-s-guide-to-lesswrong">New User Guide</Link>.</p>
-            <p>LessWrong operates under benevolent dictatorship of the Lightcone Infrastructure team, under its current CEO <Link to="/users/habryka4">habryka</Link>. It is not a democracy. For some insight into our moderation philosophy see <Link to="/posts/tscc3e5eujrsEeFN4/well-kept-gardens-die-by-pacifism">"Well Kept Gardens Die By Pacifism"</Link>.</p>
-            <p>Norms on the site get developed largely by case-law. I.e. the moderators notice that something is going wrong on the site, then they take some moderation actions to fix this, and in doing so establish some precedent about what will cause future moderation action. There is no comprehensive set of rules you can follow that will guarantee we will not moderate your comments or content. Most of the time we "know it when we see it".</p>
-            <p>LessWrong relies heavily on rate-limits in addition to deleting content and banning users. New users start out with some relatively lax rate limits to avoid spamming. Users who get downvoted acquire stricter and stricter rate limits the more they get downvoted.</p>
-            <p>Not all moderation on LessWrong is done by the moderators. Authors with enough upvoted content on the site can moderate their own posts.</p>
-            <p>Below are some of the top-level posts that explain the moderation guidelines on the site. On the right, you will find recent moderation comments by moderators, showing you examples of what moderator intervention looks like.</p>
-            <p>Beyond that, this page will show you all moderation actions and bans taken across the site by anyone, including any deleted content (unless the moderators explicitly deleted it in a way that would hide it from this page, which we do in cases like doxxing).</p>
+            {isHumanStudy ? <>
+              <p>HumanStudy Forum is a place for researchers to share work in progress, ask questions, and give each other careful, constructive feedback on research about people.</p>
+              <p>The forum is moderated by the HumanStudy team. Our basic expectations:</p>
+              <ul>
+                <li><b>Be constructive.</b> Critique ideas, methods, and evidence, not people. Personal attacks and harassment are removed.</li>
+                <li><b>Protect participants.</b> Never post identifiable participant data, private recordings, or anything that breaks consent or ethics approvals. We remove such content immediately.</li>
+                <li><b>Be honest about evidence.</b> Say how confident you are, cite sources, and flag unpublished or preliminary results.</li>
+                <li><b>Respect authorship.</b> Credit others' work, and don't share someone else's unpublished work without permission.</li>
+                <li><b>No spam or self-promotion without substance.</b> Sharing your own work is welcome; posts that are only advertising are not.</li>
+              </ul>
+              <p>Moderators may edit or remove content, rate-limit, or suspend accounts that break these expectations. Most problems are handled with a friendly note first. If you see something that needs attention, use the report option on the post or comment.</p>
+              <p>This page also shows all moderation actions taken on the forum, so how we moderate is visible to everyone.</p>
+            </> : <>
+              <p>LessWrong is trying to cultivate a specific culture. The best pointers towards that culture are the <Link to="/rationality">LessWrong Sequences</Link> and the <Link to="/posts/LbbrnRvc9QwjJeics/new-user-s-guide-to-lesswrong">New User Guide</Link>.</p>
+              <p>LessWrong operates under benevolent dictatorship of the Lightcone Infrastructure team, under its current CEO <Link to="/users/habryka4">habryka</Link>. It is not a democracy. For some insight into our moderation philosophy see <Link to="/posts/tscc3e5eujrsEeFN4/well-kept-gardens-die-by-pacifism">"Well Kept Gardens Die By Pacifism"</Link>.</p>
+              <p>Norms on the site get developed largely by case-law. I.e. the moderators notice that something is going wrong on the site, then they take some moderation actions to fix this, and in doing so establish some precedent about what will cause future moderation action. There is no comprehensive set of rules you can follow that will guarantee we will not moderate your comments or content. Most of the time we "know it when we see it".</p>
+              <p>LessWrong relies heavily on rate-limits in addition to deleting content and banning users. New users start out with some relatively lax rate limits to avoid spamming. Users who get downvoted acquire stricter and stricter rate limits the more they get downvoted.</p>
+              <p>Not all moderation on LessWrong is done by the moderators. Authors with enough upvoted content on the site can moderate their own posts.</p>
+              <p>Below are some of the top-level posts that explain the moderation guidelines on the site. On the right, you will find recent moderation comments by moderators, showing you examples of what moderator intervention looks like.</p>
+              <p>Beyond that, this page will show you all moderation actions and bans taken across the site by anyone, including any deleted content (unless the moderators explicitly deleted it in a way that would hide it from this page, which we do in cases like doxxing).</p>
+            </>}
           </div>
 
           {/* Moderator Posts */}
