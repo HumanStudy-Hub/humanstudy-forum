@@ -12,6 +12,11 @@ import UsersName from "@/components/users/UsersName";
 import UsersNameDisplay from "@/components/users/UsersNameDisplay";
 import { gql } from "@/lib/generated/gql-codegen";
 import { useQueryWithLoadMore } from "../hooks/useQueryWithLoadMore";
+import { useForumType } from "@/components/hooks/useForumType";
+import { humanStudyForumSetting } from "@/lib/instanceSettings";
+
+// HumanStudy: where the "donate" link points. Unset = no link shown.
+const humanStudyDonateUrl = process.env.NEXT_PUBLIC_HUMANSTUDY_DONATE_URL || null;
 
 const TopKarmaUsersQuery = gql(`
   query TopKarmaUsers($selector: UserSelector, $limit: Int, $enableTotal: Boolean) {
@@ -161,6 +166,8 @@ type KarmaEntry = {
 const Leaderboard = () => {
   const classes = useStyles(styles);
   const [timeframe, setTimeframe] = useState<"allTime" | "30days">("allTime");
+  const { forumType } = useForumType();
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
 
   // Query #1: Top Karma Users
   //  - We'll load 50 by default now.
@@ -224,7 +231,11 @@ const Leaderboard = () => {
       <div className={classes.pageContainer}>
         <h1 className={classes.header}>Leaderboard</h1>
         <p className={classes.subTitle}>
-          Here are our top users and donors to <a href="https://lightconeinfrastructure.com">Lightcone Infrastructure</a>, the organization maintaining LessWrong. Contribute to the site, or <a href="https://lightconeinfrastructure.com/donate">donate</a> to show up here! 
+          {isHumanStudy ? <>
+            Here are our top contributors and the donors who support HumanStudy. Contribute to the forum{humanStudyDonateUrl ? <>, or <a href={humanStudyDonateUrl}>donate</a></> : null} to show up here!
+          </> : <>
+            Here are our top users and donors to <a href="https://lightconeinfrastructure.com">Lightcone Infrastructure</a>, the organization maintaining LessWrong. Contribute to the site, or <a href="https://lightconeinfrastructure.com/donate">donate</a> to show up here!
+          </>}
         </p>
 
         <div className={classes.columnsContainer}>
@@ -290,6 +301,9 @@ const Leaderboard = () => {
               <p>Error loading donor leaderboard.</p>
             ) : (
               <>
+                {isHumanStudy && donors.length === 0 && (
+                  <p>No donors listed yet.{humanStudyDonateUrl ? <> <a href={humanStudyDonateUrl}>Be the first to support HumanStudy.</a></> : null}</p>
+                )}
                 {donorsWithAmounts.length > 0 && (
                   <LeaderboardTable headers={["#", "Name", "Amount"]}>
                     <tbody>
@@ -305,7 +319,7 @@ const Leaderboard = () => {
                 )}
 
                 {donorsOver5kUnknown.length > 0 && (
-                  <LeaderboardTable headers={["Others who have given at least $5k"]}>
+                  <LeaderboardTable headers={[isHumanStudy ? "Other supporters" : "Others who have given at least $5k"]}>
                     <tbody>
                         {donorsOver5kUnknown.map((entry, i) => (
                           <tr key={`${entry.name}-over5k-${i}`}>

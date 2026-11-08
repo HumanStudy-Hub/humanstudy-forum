@@ -1,4 +1,7 @@
 import React from "react";
+import { redirect } from "next/navigation";
+import { humanStudyForumSetting } from "@/lib/instanceSettings";
+import { getForumTypeForPage } from "@/server/utils/pageUtil";
 import CoreSequences from '@/components/sequences/CoreSequences';
 import { getDefaultMetadata, getPageTitleFields } from "@/server/pageMetadata/sharedMetadata";
 import type { Metadata } from "next";
@@ -18,7 +21,9 @@ assertRouteAttributes("/rationality", {
   hasMarkdownVersion: true,
 });
 
-export default function Page() {
+export default async function Page() {
+  // HumanStudy has no Rationality: A-Z; send people to the community collections.
+  if (humanStudyForumSetting.get(await getForumTypeForPage())) redirect('/sequences');
   return <RouteRoot subtitle={{ title: 'Rationality: A-Z', link: '/rationality' }}>
     <CoreSequences />
   </RouteRoot>;

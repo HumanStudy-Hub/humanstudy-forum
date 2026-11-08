@@ -192,12 +192,24 @@ export const styles = defineStyles("Header", (theme: ThemeType) => ({
     ...theme.typography.body2,
     alignSelf: 'center',
     whiteSpace: 'nowrap',
+    marginLeft: 8,
     marginRight: 12,
     color: theme.palette.text.secondary,
     fontSize: 14,
+    [theme.breakpoints.down('xs')]: { marginRight: 8, fontSize: 13 },
     '&:hover': { color: theme.palette.primary.main, opacity: 1 },
   },
-  humanStudyWordmark: { fontFamily: theme.palette.fonts.headerStack, fontSize: 23, letterSpacing: '-.02em', color: theme.palette.primary.main, '& span': { fontStyle: 'italic' } },
+  humanStudyWordmark: {
+    fontFamily: theme.palette.fonts.headerStack,
+    fontSize: 23,
+    letterSpacing: '-.02em',
+    whiteSpace: 'nowrap',
+    color: theme.palette.primary.main,
+    '& span': { fontStyle: 'italic' },
+    [theme.breakpoints.down('xs')]: { fontSize: 20 },
+  },
+  // Keep the whole wordmark visible on phones instead of clipping it.
+  humanStudyTitle: { minWidth: 'max-content' },
   titleLink: {
     color: theme.palette.text.bannerAdOverlay,
     fontSize: 19,
@@ -583,7 +595,7 @@ const Header = ({
                 </Link>
                 <HeaderSubtitle />
               </Typography>
-              <Typography className={classNames(classes.title, classes.hideSmUp)} variant="title">
+              <Typography className={classNames(classes.title, classes.hideSmUp, humanStudyForumSetting.get(forumType) && classes.humanStudyTitle)} variant="title">
                 <Link to="/" className={classes.titleLink}>
                   {humanStudyForumSetting.get(forumType) ? <span className={classes.humanStudyWordmark}>Human<span>Study</span></span> : forumShortTitleSetting.get(forumType)}
                 </Link>

@@ -15,6 +15,8 @@ import { accessFilterSingle, accessFilterMultiple } from '@/lib/utils/schemaUtil
 import { backgroundTask } from '../utils/backgroundTask';
 import { invalidateLoginTokensFor } from '../vulcan-lib/apollo-server/authentication';
 import { mergeAccounts } from '../scripts/mergeAccounts';
+import { getSqlClientOrThrow } from '@/server/sql/sqlClient';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 
 type NewUserUpdates = {
   username: string
@@ -396,7 +398,12 @@ export const graphqlQueries = {
   ) {
     return await context.repos.votes.getNetKarmaChangesForAuthorsOverPeriod(days, limit);
   },
-  async AirtableLeaderboards() {
+  async AirtableLeaderboards(root: void, args: void, context: ResolverContext) {
+    // HumanStudy keeps its donor list in its own table (edited in the Supabase
+    // table editor) instead of LessWrong's Airtable base.
+    if (humanStudyForumSetting.get(context.forumType)) {
+      return await fetchHumanStudyDonors();
+    }
     // If we have cached data
     if (airtableCache.data) {
       const isStale = Date.now() - airtableCache.timestamp > STALE_TIME_MS;
@@ -486,3 +493,17 @@ let inFlightPromise: Promise<AirtableLeaderboardResultType[]> | null = null;
 
 // We'll consider data stale if it's older than 10 minutes.
 const STALE_TIME_MS = 1000 * 60 * 10;
+
+async function fetchHumanStudyDonors(): Promise<AirtableLeaderboardResultType[]> {
+  const rows = await getSqlClientOrThrow().any<{ name: string, amount: number | null }>(`
+    SELECT "displayName" AS name, "amount"
+    FROM "HumanStudyDonors"
+    WHERE "showOnLeaderboard"
+    ORDER BY "amount" DESC NULLS LAST, "createdAt" ASC
+    LIMIT 200
+  `);
+  return rows.map(({ name, amount }) => ({
+    name,
+    leaderboardAmount: amount === null ? undefined : Math.round(Number(amount)),
+  }));
+}
