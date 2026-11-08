@@ -10,6 +10,8 @@ import { useOnPropsChanged } from '../hooks/useOnPropsChanged';
 import { Typography } from "../common/Typography";
 import { defineStyles } from '@/components/hooks/defineStyles';
 import { useStyles } from '@/components/hooks/useStyles';
+import { useForumType } from '@/components/hooks/useForumType';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
 
 const styles = defineStyles('PostsTimeframeList', (theme: ThemeType) => ({
   loading: {
@@ -95,6 +97,10 @@ const PostsTimeframeList = ({after, before, timeframe, numTimeBlocks, postListPa
     }
   }
   const timeBlock = timeframeToTimeBlock[timeframe]
+  const { forumType } = useForumType();
+  // HumanStudy is young: always show the current period, but skip older
+  // periods that had no posts instead of a long run of "No posts for ...".
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
   const dates = getDateRange(afterState, beforeState, timeBlock)
   const orderedDates = reverse ? [...dates].reverse() : dates
 
@@ -116,7 +122,7 @@ const PostsTimeframeList = ({after, before, timeframe, numTimeBlocks, postListPa
             ...postListParameters,
           }}
           timeBlockLoadComplete={timeBlockLoadComplete}
-          hideIfEmpty={index===0}
+          hideIfEmpty={isHumanStudy ? index !== 0 : index === 0}
           isMostRecent={date === dates[0]}
           shortform={shortform}
           includeTags={includeTags}
