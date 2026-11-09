@@ -11,6 +11,8 @@ import { gql } from '@/lib/generated/gql-codegen';
 import PostsList2 from '@/components/posts/PostsList2';
 import SingleColumnSection from '@/components/common/SingleColumnSection';
 import { SuspenseWrapper } from '@/components/common/SuspenseWrapper';
+import { useCoreTags } from '@/components/tagging/useCoreTags';
+import { useLocation, useNavigate } from '@/lib/routeUtil';
 
 const featuredPostQuery = gql(`
   query HumanStudyFeaturedPost($documentId: String!) {
@@ -37,6 +39,10 @@ const styles = defineStyles('HumanStudyHome', (theme: ThemeType) => ({
   controls: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' },
   tab: { ...theme.typography.commentStyle, fontSize: 13, border: 0, borderRadius: 2, padding: '6px 16px', background: theme.palette.panelBackground.default, color: theme.palette.text.dim3, cursor: 'pointer', '&:hover': { color: theme.palette.text.normal } },
   active: { background: theme.palette.primary.main, color: theme.palette.primary.contrastText, '&:hover': { color: theme.palette.primary.contrastText } },
+  categories: { display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', margin: '4px 0 12px' },
+  categoryLabel: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, marginRight: 2 },
+  category: { ...theme.typography.commentStyle, fontSize: 12, border: `1px solid ${theme.palette.grey[300]}`, borderRadius: 2, padding: '3px 10px', background: 'transparent', color: theme.palette.text.dim3, cursor: 'pointer', '&:hover': { color: theme.palette.primary.main, borderColor: theme.palette.primary.main } },
+  categoryActive: { borderColor: theme.palette.primary.main, color: theme.palette.primary.main, background: theme.palette.panelBackground.translucent3 },
   write: { ...theme.typography.commentStyle, marginLeft: 'auto', fontSize: 13, padding: '6px 0 6px 12px', color: theme.palette.text.dim3, '&:hover': { color: theme.palette.primary.main } },
   footer: { ...theme.typography.commentStyle, fontSize: 12, color: theme.palette.text.dim3, marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: '8px 20px' },
 }));
@@ -62,7 +68,24 @@ export default function HumanStudyHome() {
   const { forumType } = useForumType();
   const featuredPostId = humanStudyFeaturedPostIdSetting.get(forumType);
   const [feed, setFeed] = useState<Feed>('new');
-  const terms: PostsViewTerms = { view: 'new', sortedBy: feed === 'top' ? 'top' : 'new', limit: 20, ...(feed === 'questions' ? { question: true } : {}) };
+  // Categories are the forum's core tags; the selected one lives in ?category=<slug>
+  // so category chips on posts can link straight to a filtered feed.
+  const { data: coreTagsData } = useCoreTags();
+  const categories = coreTagsData?.tags?.results ?? [];
+  const navigate = useNavigate();
+  const location = useLocation();
+  const categorySlug = typeof location.query?.category === 'string' ? location.query.category : null;
+  const category = categories.find(t => t.slug === categorySlug) ?? null;
+  const selectCategory = (slug: string | null) => {
+    navigate({ ...location.location, search: slug ? `?category=${encodeURIComponent(slug)}` : '' }, { scroll: false });
+  };
+  const terms: PostsViewTerms = {
+    view: 'new',
+    sortedBy: feed === 'top' ? 'top' : 'new',
+    limit: 20,
+    ...(feed === 'questions' ? { question: true } : {}),
+    ...(category ? { filterSettings: { personalBlog: 'Default', tags: [{ tagId: category._id, tagName: category.name, filterMode: 'Required' }] } } : {}),
+  };
   return <main className={classes.root}>
     <SingleColumnSection>
       {featuredPostId && <SuspenseWrapper name="HumanStudyFeatured"><FeaturedDiscussion documentId={featuredPostId} /></SuspenseWrapper>}
@@ -71,7 +94,12 @@ export default function HumanStudyHome() {
           {tabs.map(tab => <button key={tab.id} role="tab" aria-selected={feed === tab.id} className={classNames(classes.tab, feed === tab.id && classes.active)} onClick={() => setFeed(tab.id)}>{tab.label}</button>)}
           <Link to="/newPost" className={classes.write}>Write a post</Link>
         </div>
-        <PostsList2 key={feed} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
+        {categories.length > 0 && <div className={classes.categories} role="group" aria-label="Filter by category">
+          <span className={classes.categoryLabel}>Category:</span>
+          <button className={classNames(classes.category, !category && classes.categoryActive)} aria-pressed={!category} onClick={() => selectCategory(null)}>All</button>
+          {categories.map(tag => <button key={tag._id} className={classNames(classes.category, category?._id === tag._id && classes.categoryActive)} aria-pressed={category?._id === tag._id} onClick={() => selectCategory(category?._id === tag._id ? null : tag.slug)}>{tag.name}</button>)}
+        </div>}
+        <PostsList2 key={`${feed}-${category?._id ?? 'all'}`} terms={terms} showPostedAt hideTrailingButtons boxShadow={false} />
       </section>
       <footer className={classes.footer}>
         <a href="https://humanstudy-hub.com">HumanStudy Hub ↗</a>
