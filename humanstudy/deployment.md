@@ -45,7 +45,9 @@ creating another paid compute instance. Do not delete it during this rollout.
 | `NEXT_PUBLIC_SENTRY_DSN` | HumanStudy Sentry project DSN (public; inlined at build). Unset = Sentry off |
 | `NEXT_PUBLIC_HUMANSTUDY_DONATE_URL` | Optional donate link on /leaderboard. Donor rows live in table `forum."HumanStudyDonors"` |
 | `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Optional: source-map upload at build time. Token is secret |
-| `NODE_OPTIONS` | `--max-old-space-size=6144` (8192 makes the 8 GB build container OOM-kill `next build`) |
+| `NODE_OPTIONS` | `--max-old-space-size=5120` (8192 always, 6144 sometimes OOM-killed the 8 GB build container) |
+| `NEXT_SERVER_SOURCE_MAPS` | `false`: skip server source maps; they made "Collecting page data" run out of memory |
+| `VERCEL_BUILD_SYSTEM_REPORT` | `1`: print the build memory report |
 
 Do not include `sslmode` in `PG_URL`; node-postgres otherwise replaces explicit TLS settings.
 All forum tables have RLS and a policy restricted to the forum server role. Public, anon and
