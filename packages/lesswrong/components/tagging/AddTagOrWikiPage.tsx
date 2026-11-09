@@ -14,6 +14,28 @@ import { defineStyles } from '@/components/hooks/defineStyles';
 import { useStyles } from '@/components/hooks/useStyles';
 import { AnalyticsContext } from '@/lib/analyticsEvents';
 import { useCaptureSearchStateChange, useCaptureSearchResultSelected } from '../search/useSearchAnalytics';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
+
+// HumanStudy: create a tag straight from the picker by typing its name.
+async function createTagByName(name: string): Promise<{_id: string, name: string, slug: string}> {
+  const response = await fetch("/graphql", {
+    method: "POST",
+    credentials: "include",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      query: `mutation humanStudyCreateTag($data: CreateTagDataInput!) {
+        createTag(data: $data) { data { _id name slug } }
+      }`,
+      variables: { data: { name } },
+    }),
+  });
+  const json = await response.json();
+  const tag = json?.data?.createTag?.data;
+  if (!tag) {
+    throw new Error(json?.errors?.[0]?.message ?? "Could not create tag");
+  }
+  return tag;
+}
 
 const styles = defineStyles("AddTagOrWikiPage", (theme: ThemeType) => ({
   root: {
@@ -30,6 +52,12 @@ const styles = defineStyles("AddTagOrWikiPage", (theme: ThemeType) => ({
     '& .ais-SearchBox-submitIcon path': {
       fill: theme.palette.grey[900],
     },
+  },
+  createError: {
+    padding: "0 8px 8px",
+    color: theme.palette.error.main,
+    ...theme.typography.commentStyle,
+    fontSize: 13,
   },
   newTag: {
     display: "block",
@@ -51,11 +79,19 @@ const AddTagOrWikiPage = ({onTagSelected, isVotingContext, onlyTags, numSuggesti
   const classes = useStyles(styles);
   const currentUser = useCurrentUser()
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [query, setQuery] = React.useState("");
+  const [creating, setCreating] = React.useState(false);
+  const [createError, setCreateError] = React.useState<string|null>(null);
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
+  const canCreateTags = tagUserHasSufficientKarma(currentUser, "new", forumType);
+  const newTagName = query.trim();
   const indexName = getSearchIndexName("Tags");
   const captureSearchState = useCaptureSearchStateChange("addTagOrWikiPage", "Tags", indexName);
   const captureResultSelected = useCaptureSearchResultSelected();
   const searchStateChanged = React.useCallback((searchState: SearchState) => {
     setSearchOpen((searchState.query?.length ?? 0) > 0);
+    setQuery(searchState.query ?? "");
+    setCreateError(null);
     captureSearchState(searchState);
   }, [captureSearchState]);
   const inputRef = useRef<HTMLInputElement|null>(null);
@@ -137,12 +173,35 @@ const AddTagOrWikiPage = ({onTagSelected, isVotingContext, onlyTags, numSuggesti
         />
       }/>
     </InstantSearch>
+    {isHumanStudy && canCreateTags && newTagName.length > 0 && <>
+      <DropdownDivider />
+      <a
+        className={classes.newTag}
+        onClick={async (ev) => {
+          ev.stopPropagation();
+          if (creating) return;
+          setCreating(true);
+          setCreateError(null);
+          try {
+            const tag = await createTagByName(newTagName);
+            onTagSelected({ tagId: tag._id, tagName: tag.name, tagSlug: tag.slug });
+          } catch (e) {
+            setCreateError(e.message);
+          } finally {
+            setCreating(false);
+          }
+        }}
+      >
+        {creating ? "Creating…" : <>+ Create tag “{newTagName}”</>}
+      </a>
+      {createError && <div className={classes.createError}>{createError}</div>}
+    </>}
     {showAllTagsAndCreateTags && <>
       <DropdownDivider />
       <Link target="_blank" to={getAllTagsPath()} className={classes.newTag}>
-        All Wikitags
+        {isHumanStudy ? "All tags" : "All Wikitags"}
       </Link>
-      {tagUserHasSufficientKarma(currentUser, "new", forumType) && <Link
+      {!isHumanStudy && canCreateTags && <Link
         target="_blank"
         to={getTagCreateUrl()}
         className={classes.newTag}

@@ -1,7 +1,7 @@
 import type { ForumTypeString } from '@/lib/instanceSettings';
 import qs from "qs";
 import { forumSelect } from "../../forumTypeUtils";
-import { siteUrlSetting, allowTypeIIIPlayerSetting } from '@/lib/instanceSettings';
+import { siteUrlSetting, allowTypeIIIPlayerSetting, humanStudyForumSetting } from '@/lib/instanceSettings';
 import { combineUrls } from "../../vulcan-lib/utils";
 import { TagCommentType } from "../comments/types";
 import type { TagLens } from "@/lib/arbital/useTagLenses";
@@ -94,6 +94,8 @@ export const tagGetRevisionLink = (tag: DbTag|TagBasicInfo, versionNumber: strin
 export const tagUserHasSufficientKarma = (user: UsersCurrent | DbUser | null, action: "new" | "edit", forumType: ForumTypeString): boolean => {
   if (!user) return false
   if (user.isAdmin) return true
+  // HumanStudy: any member can create tags (karma is not used to gate this yet).
+  if (action === "new" && humanStudyForumSetting.get(forumType) && !user.deleted) return true
   if ((user.karma) >= getTagMinimumKarmaPermissions(forumType)[action]) return true
   return false
 }

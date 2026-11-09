@@ -101,7 +101,7 @@ const TagFilterSettingsInner = ({
           }}
         />
   
-        {<LWTooltip title={`Add Wikitag Filter`}>
+        {<LWTooltip title={`Add tag filter`}>
             <AddTagButton hasTooltip={false} onTagSelected={({tagId,tagName}: {tagId: string, tagName: string}) => {
               if (!filterSettings.tags.some(t=>t.tagId===tagId)) {
                 const defaultFilterMode = userHasNewTagSubscriptions(currentUser) ? 25 : "Default"
