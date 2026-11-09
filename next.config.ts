@@ -74,7 +74,10 @@ const nextConfig: NextConfig = {
     // LW/AF metadata intentionally reads request headers and cookies. Only
     // validate instant navigations for routes that explicitly opt in.
     instantInsights: { validationLevel: 'manual-warning' },
-    serverSourceMaps: true,
+    // Server source maps make every build worker load large .map files and push
+    // the 8 GB Vercel build container into OOM during "Collecting page data".
+    // Set NEXT_SERVER_SOURCE_MAPS=false to turn them off for a build.
+    serverSourceMaps: process.env.NEXT_SERVER_SOURCE_MAPS !== 'false',
     turbopackFileSystemCacheForDev: true,
   },
   
