@@ -46,7 +46,7 @@ const AddTagButton = ({onTagSelected, menuPlacement="bottom-start", isVotingCont
       {children
         ? children
         : <span className={classes.defaultButton}>
-          + {`Add Wikitag`}
+          + {`Add tag`}
         </span>
       }
         <LWPopper
