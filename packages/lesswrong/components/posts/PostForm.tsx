@@ -27,6 +27,7 @@ import ForumIcon from "../common/ForumIcon";
 import { useMutation } from "@apollo/client/react";
 import EditorSettingsSidebar, { getFooterTagListPostInfo } from "./EditorSettingsSidebar";
 import FooterTagList from "../tagging/FooterTagList";
+import HumanStudyEditorCategories from "@/components/humanstudy/HumanStudyEditorCategories";
 import { useForumType } from "@/components/hooks/useForumType";
 import { humanStudyForumSetting } from "@/lib/instanceSettings";
 import MobileEditorBottomBar from "./MobileEditorBottomBar";
@@ -231,6 +232,19 @@ const formStyles = defineStyles('PostForm', (theme: ThemeType) => ({
     flexBasis: "100%",
     marginTop: 4,
     fontSize: 14,
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  },
+  humanStudyTagLine: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 10,
+  },
+  humanStudyTagLabel: {
+    flex: "0 0 64px",
+    fontSize: 13,
+    color: theme.palette.text.dim3,
   },
   metaAuthorInfo: {
     color: theme.palette.text.primary,
@@ -455,6 +469,7 @@ const PostForm = ({
   const isAboveMobile = useIsAboveBreakpoint("md", false);
   const { forumType } = useForumType();
   const isHumanStudy = humanStudyForumSetting.get(forumType);
+  const [tagListVersion, setTagListVersion] = useState(0);
   const [sidebarPanel, setSidebarPanel] = useState<"publish" | "settings" | "sharing" | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
@@ -935,12 +950,21 @@ const PostForm = ({
             {/* HumanStudy: tags right under the title, not only in the settings panel */}
             {isHumanStudy && canEditMetadata && !isEvent && !isDialogue && (
               <div className={classes.humanStudyTagRow}>
-                <FooterTagList
-                  post={getFooterTagListPostInfo(initialData)}
-                  hideScore
-                  hidePostTypeTag
-                  link={false}
-                />
+                <div className={classes.humanStudyTagLine}>
+                  <span className={classes.humanStudyTagLabel}>Category</span>
+                  <HumanStudyEditorCategories postId={initialData._id} onChange={() => setTagListVersion(v => v + 1)} />
+                </div>
+                <div className={classes.humanStudyTagLine}>
+                  <span className={classes.humanStudyTagLabel}>Tags</span>
+                  <FooterTagList
+                    key={tagListVersion}
+                    post={getFooterTagListPostInfo(initialData)}
+                    hideScore
+                    hidePostTypeTag
+                    hideCoreTags
+                    link={false}
+                  />
+                </div>
               </div>
             )}
           </div>

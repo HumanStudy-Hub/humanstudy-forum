@@ -132,6 +132,7 @@ const FooterTagList = ({
   useAltAddTagButton,
   smallText=false,
   showCoreTags,
+  hideCoreTags,
   hidePostTypeTag,
   link=true,
   highlightAutoApplied=false,
@@ -149,6 +150,8 @@ const FooterTagList = ({
   hideAddTag?: boolean,
   useAltAddTagButton?: boolean,
   showCoreTags?: boolean
+  /** Leave out core tags (HumanStudy shows those as categories elsewhere). */
+  hideCoreTags?: boolean,
   hidePostTypeTag?: boolean,
   smallText?: boolean,
   link?: boolean,
@@ -318,11 +321,12 @@ const FooterTagList = ({
     <PostTypeTag label="Event" tooltipBody={contentTypeInfo.event.tooltipBody} neverCoreStyling={neverCoreStyling}/>
   </MaybeLink> : null
 
-  const sortedTagInfo = results
+  const allSortedTagInfo = results
     ? stableSortTags(results.filter((tagRel) => !!tagRel?.tag).map((tr) => ({ tag: tr.tag!, tagRel: tr })), {
         coreTags: "last",
       })
     : post.tags.map((tag) => ({ tag, tagRel: undefined }));
+  const sortedTagInfo = hideCoreTags ? allSortedTagInfo.filter(({ tag }) => !tag?.core) : allSortedTagInfo;
   const menuPlacement = useAltAddTagButton ? "bottom-end" : undefined;
 
   const addTagButton = <AddTagButton onTagSelected={onTagSelected} isVotingContext menuPlacement={menuPlacement}>
