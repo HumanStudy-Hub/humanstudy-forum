@@ -26,6 +26,9 @@ import AlignmentCrosspostLink from "../AlignmentCrosspostLink";
 import ReadTime from "./ReadTime";
 import LWCommentCount from "../TableOfContents/LWCommentCount";
 import { SuspenseWrapper } from '@/components/common/SuspenseWrapper';
+import HumanStudyPostCategories from '@/components/humanstudy/HumanStudyPostCategories';
+import { humanStudyForumSetting } from '@/lib/instanceSettings';
+import { useForumType as useHumanStudyForumType } from '@/components/hooks/useForumType';
 import { BOOKUI_LINKPOST_WORDCOUNT_THRESHOLD } from './constants';
 import { defineStyles } from '@/components/hooks/defineStyles';
 import { useStyles } from '@/components/hooks/useStyles';
@@ -268,6 +271,7 @@ const LWPostsPageHeader = ({post, showEmbeddedPlayer, toggleEmbeddedPlayer, dial
 
   const reviewYear = 'reviewWinner' in post && post.reviewWinner?.reviewYear;
 
+  const isHumanStudy = humanStudyForumSetting.get(useHumanStudyForumType().forumType);
   return <div className={classNames(classes.root, {[classes.eventHeader]: post.isEvent, [classes.rootWithAudioPlayer]: !!showEmbeddedPlayer}, {[classes.rootWithSplashPageHeader]: showSplashPageHeader})}>
     {post.group && <PostsGroupDetails post={post} documentId={post.group._id} />}
     <AnalyticsContext pageSectionContext="topSequenceNavigation">
@@ -317,6 +321,7 @@ const LWPostsPageHeader = ({post, showEmbeddedPlayer, toggleEmbeddedPlayer, dial
             <PostActionsButton post={post} flip />
           </div>
         </div>
+        {isHumanStudy && !post.isEvent && <HumanStudyPostCategories tags={post.tags} />}
       </div>
       <div className={classes.mobileHeaderVote}>
         <PostsVote post={post} />

@@ -8,7 +8,8 @@ import withErrorBoundary from '../common/withErrorBoundary';
 import classNames from 'classnames';
 import { NEW_COMMENT_MARGIN_BOTTOM } from '../comments/constants';
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import { cloudinaryCloudName } from '@/lib/instanceSettings';
+import { cloudinaryCloudName, humanStudyForumSetting } from '@/lib/instanceSettings';
+import HumanStudyPostCategories from '@/components/humanstudy/HumanStudyPostCategories';
 import { getReviewPhase, postEligibleForReview, postPassedNomination, REVIEW_YEAR } from '../../lib/reviewUtils';
 import { PostsItemConfig, usePostsItem } from './usePostsItem';
 import PostsItemTrailingButtons, { MENU_WIDTH, DismissButton } from './PostsItemTrailingButtons';
@@ -442,6 +443,7 @@ export type PostsList2Props = PostsItemConfig;
 
 const LWPostsItem = (props: PostsItemConfig) => {
   const { isLW, forumType } = useForumType();
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
   const {
     post,
     postLink,
@@ -575,6 +577,7 @@ const LWPostsItem = (props: PostsItemConfig) => {
               {post.isEvent && !post.onlineEvent && <PostsItem2MetaInfo className={classes.event}>
                 <EventVicinity post={post} />
               </PostsItem2MetaInfo>}
+              {isHumanStudy && <HumanStudyPostCategories tags={post.tags} compact />}
               {/* space in-between title and author if there is width remaining */}
               <span className={classes.spacer} />
 
