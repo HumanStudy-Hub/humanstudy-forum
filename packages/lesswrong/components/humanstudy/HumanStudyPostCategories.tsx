@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Link } from '@/lib/reactRouterWrapper';
 import { defineStyles, useStyles } from '@/components/hooks/useStyles';
@@ -38,6 +38,18 @@ const styles = defineStyles('HumanStudyPostCategories', (theme: ThemeType) => ({
     lineHeight: '16px',
     padding: '0 6px',
   },
+  more: {
+    ...theme.typography.commentStyle,
+    fontSize: 11,
+    lineHeight: '16px',
+    padding: '0 5px',
+    border: 0,
+    borderRadius: 2,
+    cursor: 'pointer',
+    background: 'transparent',
+    color: theme.palette.text.dim3,
+    '&:hover': { color: theme.palette.primary.main },
+  },
   otherTag: {
     color: theme.palette.text.dim3,
   },
@@ -55,13 +67,17 @@ const HumanStudyPostCategories = ({ tags, compact = false }: {
   compact?: boolean,
 }) => {
   const classes = useStyles(styles);
+  const [expanded, setExpanded] = useState(false);
   const all = (tags ?? []).filter((t): t is CategoryTag => !!t);
   const categories = all.filter(t => t.core);
   const others = compact ? [] : all.filter(t => !t.core);
   if (!categories.length && !others.length) return null;
+  // In post lists show one category and a "+N" toggle for the rest, so titles keep their room.
+  const hiddenCount = compact && !expanded ? Math.max(categories.length - 1, 0) : 0;
+  const shownCategories = hiddenCount ? categories.slice(0, 1) : categories;
 
   return <span className={classNames(classes.root, compact && classes.compact)}>
-    {categories.map(tag => <Link
+    {shownCategories.map(tag => <Link
       key={tag._id}
       to={humanStudyCategoryUrl(tag.slug)}
       className={classNames(classes.chip, compact && classes.compactChip)}
@@ -69,6 +85,15 @@ const HumanStudyPostCategories = ({ tags, compact = false }: {
     >
       {tag.name}
     </Link>)}
+    {compact && categories.length > 1 && <button
+      type="button"
+      className={classes.more}
+      title={expanded ? "Show fewer categories" : categories.slice(1).map(t => t.name).join(", ")}
+      aria-expanded={expanded}
+      onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); setExpanded(!expanded); }}
+    >
+      {expanded ? "−" : `+${hiddenCount}`}
+    </button>}
     {others.map(tag => <Link
       key={tag._id}
       to={tagGetUrl(tag)}
