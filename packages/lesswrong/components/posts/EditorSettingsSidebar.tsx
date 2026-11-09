@@ -784,7 +784,7 @@ const styles = defineStyles("EditorSettingsSidebar", (theme: ThemeType) => ({
   },
 }));
 
-function getFooterTagListPostInfo(post: EditablePost) {
+export function getFooterTagListPostInfo(post: EditablePost) {
   const {
     _id, tags, postCategory, isEvent,
     curatedDate = null,
@@ -1449,7 +1449,7 @@ const EditorSettingsSidebar = ({
 
       {mode === "settings" && <div className={classes.panel}>
         {canSeeTags && (
-          <AccordionSection title="Wikitags" defaultOpen contentClassName={classes.tagSection}>
+          <AccordionSection title="Tags" defaultOpen contentClassName={classes.tagSection}>
             <form.Field name="tagRelevance">
               {() => (
                 <FooterTagList

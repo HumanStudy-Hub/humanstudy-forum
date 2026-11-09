@@ -25,7 +25,10 @@ import Error404 from "../common/Error404";
 import FormComponentCheckbox from "../form-components/FormComponentCheckbox";
 import ForumIcon from "../common/ForumIcon";
 import { useMutation } from "@apollo/client/react";
-import EditorSettingsSidebar from "./EditorSettingsSidebar";
+import EditorSettingsSidebar, { getFooterTagListPostInfo } from "./EditorSettingsSidebar";
+import FooterTagList from "../tagging/FooterTagList";
+import { useForumType } from "@/components/hooks/useForumType";
+import { humanStudyForumSetting } from "@/lib/instanceSettings";
 import MobileEditorBottomBar from "./MobileEditorBottomBar";
 import UnanchoredCommentsBadge from "./UnanchoredCommentsBadge";
 import { useIsAboveBreakpoint } from "../hooks/useScreenWidth";
@@ -223,6 +226,11 @@ const formStyles = defineStyles('PostForm', (theme: ThemeType) => ({
     color: theme.palette.text.dim3,
     marginTop: 12,
     marginBottom: 96,
+  },
+  humanStudyTagRow: {
+    flexBasis: "100%",
+    marginTop: 4,
+    fontSize: 14,
   },
   metaAuthorInfo: {
     color: theme.palette.text.primary,
@@ -445,6 +453,8 @@ const PostForm = ({
   const currentUser = useCurrentUser();
   const [editorType, setEditorType] = useState<string | undefined>(initialData.contents?.originalContents.type);
   const isAboveMobile = useIsAboveBreakpoint("md", false);
+  const { forumType } = useForumType();
+  const isHumanStudy = humanStudyForumSetting.get(forumType);
   const [sidebarPanel, setSidebarPanel] = useState<"publish" | "settings" | "sharing" | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
@@ -921,6 +931,17 @@ const PostForm = ({
                   <ForumIcon icon="CloudOff" className={classes.disconnectedIcon} />
                 </span>
               </LWTooltip>
+            )}
+            {/* HumanStudy: tags right under the title, not only in the settings panel */}
+            {isHumanStudy && canEditMetadata && !isEvent && !isDialogue && (
+              <div className={classes.humanStudyTagRow}>
+                <FooterTagList
+                  post={getFooterTagListPostInfo(initialData)}
+                  hideScore
+                  hidePostTypeTag
+                  link={false}
+                />
+              </div>
             )}
           </div>
 
