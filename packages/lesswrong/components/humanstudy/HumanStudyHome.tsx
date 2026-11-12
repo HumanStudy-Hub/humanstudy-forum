@@ -81,6 +81,8 @@ export default function HumanStudyHome() {
   };
   const terms: PostsViewTerms = {
     view: 'new',
+    // forum: true puts pinned (sticky) posts first, ordered by stickyPriority.
+    forum: true,
     sortedBy: feed === 'top' ? 'top' : 'new',
     limit: 20,
     ...(feed === 'questions' ? { question: true } : {}),
